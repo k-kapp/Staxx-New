@@ -572,41 +572,52 @@ void game::mainloop()
 						continue;
 					}
 
-
+					move_type directed_move;
+					bool directed = true;
 					switch (event.key.keysym.sym)
 					{
 						case (SDLK_SPACE):
 						{
+							directed_move = ROTATE_MV;
 							move_active(ROTATE_MV, false);
 						} break;
 						case (SDLK_RIGHT):
 						{
+							directed_move = RIGHT_MV;
 							if (curr_move == LEFT_MV)
 								break;
 							move_active(RIGHT_MV, false);
 						} break;
 						case (SDLK_LEFT):
 						{
+							directed_move = LEFT_MV;
 							if (curr_move == RIGHT_MV)
 								break;
 							move_active(LEFT_MV, false);
 						} break;
 						case (SDLK_DOWN):
 						{
+							directed_move = DOWN_MV;
 							if (curr_move == UP_MV)
 								break;
-							reset_timer();
-							SDL_FlushEvent(SDL_USEREVENT);
 							move_active(DOWN_MV, false);
 						} break;
 						case (SDLK_UP):
 						{
+							directed_move = UP_MV;
 							if (curr_move == DOWN_MV)
 								break;
 							move_active(UP_MV, false);
 						} break;
 						default:
-						{}
+						{
+							directed = false;
+						}
+					}
+					if (directed && (directed_move == curr_move))
+					{
+						reset_timer();
+						SDL_FlushEvent(SDL_USEREVENT);
 					}
 				} break;
 				case (SDL_USEREVENT):

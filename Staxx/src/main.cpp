@@ -49,7 +49,7 @@ void new_design_grid(menu * parent)
 	parent->hide_menu();
 
 	auto grid = design_grid(8, { {0, 100, 0}, {100, 0, 100} }, { {0, 150, 0}, {150, 0, 150} }, { {0, 250, 0}, {250, 0, 250} },
-		100, 100, BLOCK_SIZE, 1);
+		100, 100, DESIGN_BLOCK_SIZE, 1);
 	grid.set_new_on_color("red");
 	grid.mainloop();
 

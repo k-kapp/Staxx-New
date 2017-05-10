@@ -4,10 +4,10 @@
 
 const int INIT_DELAY = 500;
 
-const int BLOCK_SIZE = 40;
+const int BLOCK_SIZE = 20;
 
-const int PLAY_BLOCK_SIZE = 40;
-const int DESIGN_BLOCK_SIZE = 40;
+const int PLAY_BLOCK_SIZE = 20;
+const int DESIGN_BLOCK_SIZE = 20;
 
 const int PLAY_BORDER_SIZE = 1;
 const int DESIGN_BORDER_SIZE = 1;
@@ -20,8 +20,8 @@ const int PLAY_SCREEN_WIDTH = 1300;
 const int PLAY_SCREEN_HEIGHT = 800;
 const int PLAY_GRID_X = 100;
 const int PLAY_GRID_Y = 100;
-const int PLAY_ROWS = 14;
-const int PLAY_COLS = 10;
+const int PLAY_ROWS = 20;
+const int PLAY_COLS = 20;
 
 const int NEXT_GRID_BLOCK_SIZE = PLAY_BLOCK_SIZE / 2;
 const int NEXT_GRID_ROWS = 8;
