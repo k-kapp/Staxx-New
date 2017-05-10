@@ -18,6 +18,7 @@ public:
 	int get_width();
 	int get_row();
 	int get_col();
+	void move_up(bool reverse=false);
 	void move_down(bool reverse=false);
 	void move_left(bool reverse=false);
 	void move_right(bool reverse=false);

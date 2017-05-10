@@ -296,25 +296,38 @@ bool_2d & shape::get_shape_ref(orient spec)
 void shape::set_padding(orient spec, unsigned num_cols, unsigned num_rows)
 {
 	int size_across;
+	int size_vert;
 	switch (spec)
 	{
 		case (UP):
 		case (DOWN):
 			size_across = up.at(0).size();
+			size_vert = up.size();
 			break;
 		case (RIGHT):
 		case (LEFT):
 			size_across = right.at(0).size();
+			right.size();
 			break;
 	}
 	if ((num_cols - size_across) % 2 == 1)
 	{
-		padding.first = (num_cols - size_across + 1)/2;
-		padding.second = (num_cols - size_across - 1)/2;
+		horiz_padding.first = (num_cols - size_across + 1)/2;
+		horiz_padding.second = (num_cols - size_across - 1)/2;
 	}
 	else
 	{
-		padding.first = padding.second = (num_cols - size_across)/2;
+		horiz_padding.first = horiz_padding.second = (num_cols - size_across)/2;
+	}
+
+	if ((num_rows - size_vert) % 2 == 1)
+	{
+		vert_padding.first = (num_rows - size_vert + 1) / 2;
+		vert_padding.second = (num_rows - size_vert - 1) / 2;
+	}
+	else
+	{
+		vert_padding.first = vert_padding.second = (num_rows - size_vert) / 2;
 	}
 }
 
@@ -328,9 +341,14 @@ int shape::get_width(orient spec)
 	return get_shape_ref(spec).at(0).size();
 }
 
-pair<int, int> shape::get_padding()
+pair<int, int> shape::get_horiz_padding()
 {
-	return padding;
+	return horiz_padding;
+}
+
+pair<int, int> shape::get_vert_padding()
+{
+	return vert_padding;
 }
 
 bool shape::get_coords(int row, int col, orient spec)

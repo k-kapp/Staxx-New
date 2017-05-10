@@ -38,7 +38,8 @@ public:
 	int get_width(orient);
 	bool_2d get_shape(orient spec);
 	deque<bool> & get_row(int row, orient spec);
-	pair<int, int> get_padding();
+	pair<int, int> get_horiz_padding();
+	pair<int, int> get_vert_padding();
 	void set_padding(orient, unsigned num_cols, unsigned num_rows);
 private:
 	friend class boost::serialization::access;
@@ -51,7 +52,8 @@ private:
 		ar & right;
 		ar & down;
 		ar & left;
-		ar & padding;
+		ar & horiz_padding;
+		//ar & vert_padding;
 	}
 
 	bool_2d orig_arr;
@@ -60,7 +62,8 @@ private:
 	bool_2d right;
 	bool_2d down;
 	bool_2d left;
-	pair<int, int> padding;
+	pair<int, int> horiz_padding;
+	pair<int, int> vert_padding;
 
 	void make_orients();
 	int first_true_idx(const std::deque<bool> &bool_vec);

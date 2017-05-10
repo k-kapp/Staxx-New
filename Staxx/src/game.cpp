@@ -42,7 +42,7 @@ Uint32 callback_move_down(Uint32 interval, void * param)
 
 game::game(tile_colors colors, tile_colors default_on_colors)
 			: game_state(PLAY_SCREEN_TITLE, PLAY_SCREEN_X, PLAY_SCREEN_Y, PLAY_SCREEN_WIDTH, PLAY_SCREEN_HEIGHT), 
-				main_grid(PLAY_ROWS + 1, PLAY_COLS + 2, 
+				main_grid(PLAY_ROWS + 2, PLAY_COLS + 2, 
 					make_texture_from_colors(colors, PLAY_BLOCK_SIZE, PLAY_BLOCK_SIZE, renderer), 
 					make_texture_from_colors(default_on_colors, PLAY_BLOCK_SIZE, PLAY_BLOCK_SIZE, renderer),
 					PLAY_SCREEN_X, 
@@ -150,6 +150,11 @@ void game::render_score_texture()
 	SDL_RenderCopy(renderer, score_texture, NULL, &score_rect);
 }
 
+void game::move_active_up()
+{
+	active_block->move_up();
+}
+
 void game::move_active_down()
 {
 	active_block->move_down();
@@ -172,6 +177,15 @@ void game::rotate_active_right()
 
 void game::set_borders()
 {
+	for (auto tile_iter = main_grid.tiles[0].begin(); tile_iter != main_grid.tiles[0].end();
+			advance(tile_iter, 1))
+	{
+		(*tile_iter)->set_on_colors({{0, 150, 150}, {0, 150, 150}});
+		(*tile_iter)->set_off_colors((*tile_iter)->get_on_colors());
+		(*tile_iter)->set_occupied();
+		//(*tile_iter)->set_activation_level(true);
+	}
+
 	for (auto tile_iter = main_grid.tiles[main_grid.num_rows - 1].begin(); tile_iter != main_grid.tiles[main_grid.num_rows - 1].end();
 			advance(tile_iter, 1))
 	{
@@ -245,6 +259,10 @@ void game::move_active(move_type move, bool regular)
 
 	switch (move)
 	{
+		case (UP_MV):
+		{
+			move_func = &game::move_active_up;
+		} break;
 		case (DOWN_MV):
 		{
 			move_func = &game::move_active_down;
@@ -267,7 +285,7 @@ void game::move_active(move_type move, bool regular)
 
 	(this->*move_func)();
 
-	if (has_clash() && (move == DOWN_MV))
+	if (has_clash() && (move == curr_move))
 	{
 		set_active_tiles(main_grid, active_block);
 		vector<int> rows_idxes = get_full_rows();
@@ -348,6 +366,8 @@ void game::sample_next()
 	next_blocks.pop_front();
 
 	next_blocks.push_back(shared_ptr<block>(new block(generate_next_shape_ptr().get(), {100, 0, 0}, {0, 0, 100})));
+
+	curr_move = static_cast<move_type>(static_cast<int>(unif_real(gen) * 4));
 
 	//SDL_RenderCopy(renderer, next_text_texture, NULL, &next_text_rect);
 }
@@ -534,7 +554,6 @@ void game::mainloop()
 
 	while (true)
 	{
-		
 		deactivate = false;
 		
 		if (SDL_PollEvent(&event))
@@ -562,17 +581,29 @@ void game::mainloop()
 						} break;
 						case (SDLK_RIGHT):
 						{
+							if (curr_move == LEFT_MV)
+								break;
 							move_active(RIGHT_MV, false);
 						} break;
 						case (SDLK_LEFT):
 						{
+							if (curr_move == RIGHT_MV)
+								break;
 							move_active(LEFT_MV, false);
 						} break;
 						case (SDLK_DOWN):
 						{
+							if (curr_move == UP_MV)
+								break;
 							reset_timer();
 							SDL_FlushEvent(SDL_USEREVENT);
 							move_active(DOWN_MV, false);
+						} break;
+						case (SDLK_UP):
+						{
+							if (curr_move == DOWN_MV)
+								break;
+							move_active(UP_MV, false);
 						} break;
 						default:
 						{}
@@ -585,7 +616,7 @@ void game::mainloop()
 						//void (*move_down_ptr)(void *) = (void(*)(void *)) event.user.data1;
 						//void * param = event.user.data2;
 						//move_down(param);
-						move_active(RIGHT_MV, true);
+						move_active(curr_move, true);
 					}
 				} break;
 				default:

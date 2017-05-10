@@ -9,8 +9,8 @@ block::block(shape * design, color base_col, color border_col)
 	curr_orient = UP;
 	colors.base = base_col;
 	colors.border = border_col;
-	row = 0;
-	col = design->get_padding().first;
+	row = design->get_vert_padding().first;
+	col = design->get_horiz_padding().first;
 }
 
 bool block::operator () (int row, int col)
@@ -59,6 +59,19 @@ bool block::active_pos(int row, int col)
 		return false;
 	}
 	return false;
+}
+
+void block::move_up(bool reverse)
+{
+	if (!reverse)
+	{
+		last_move = UP_MV;
+		row--;
+	}
+	else
+	{
+		row++;
+	}
 }
 
 void block::move_down(bool reverse)
@@ -122,6 +135,10 @@ void block::reverse_previous()
 {
 	switch (last_move)
 	{
+		case (UP_MV):
+		{
+			move_up(true);
+		} break;
 		case (DOWN_MV):
 		{
 			move_down(true);

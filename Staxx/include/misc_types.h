@@ -30,8 +30,9 @@ typedef enum occupant_type_
 	ACTIVE
 } occupant_type;
 
-typedef enum last_move_type_
+typedef enum move_type
 {
+	UP_MV,
 	LEFT_MV,
 	DOWN_MV,
 	RIGHT_MV,

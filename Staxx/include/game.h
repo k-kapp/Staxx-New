@@ -33,6 +33,7 @@ public:
 	void add_shapes(const shape_vec_type &shape_vec);
 	void init_sample();
 	void sample_next();
+	void move_active_up();
 	void move_active_down();
 	void move_active_left();
 	void move_active_right();
@@ -120,7 +121,7 @@ private:
 
 	SDL_Texture * next_block_texture;
 
-	last_move_type_
+	move_type curr_move;
 
 };
 
