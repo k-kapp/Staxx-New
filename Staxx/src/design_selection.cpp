@@ -23,17 +23,17 @@ design_selection::design_selection(int grid_x, int grid_y)
 		bind(&design_selection::cancel, this), 
 		"Cancel", renderer)
 {
-	import_shapes();
+	init_selection();
 }
 
 
-void design_selection::import_shapes()
+void design_selection::init_selection()
 {
-	vector<shared_ptr<shape> > shapes = ::import_shapes();
+	//vector<shared_ptr<shape> > shapes = ::import_shapes();
 
 	vector<block> blocks;
 
-	for (auto &shape : shapes)
+	for (auto &shape : all_shapes)
 	{
 		blocks.push_back(block(shape.get(), { 200, 0, 0 }, { 50, 0, 0 }));
 	}
@@ -94,9 +94,16 @@ void design_selection::cancel()
 
 void design_selection::save_selection()
 {
-	/*
-		add code for saving selected shapes here
-	*/
+	usable_shapes.clear();
+
+	for (int i = 0; i < selectors.size(); i++)
+	{
+		shared_ptr<clickable_tile> &tile_ptr = selectors.at(i);
+		if (tile_ptr->get_activation_level() == 2)
+		{
+			usable_shapes.push_back(all_shapes.at(i));
+		}
+	}
 
 	quit = true;
 }

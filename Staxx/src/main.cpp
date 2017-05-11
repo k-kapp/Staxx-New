@@ -8,6 +8,7 @@
 #include "../include/constants.h"
 #include "../include/common_surfaces.h"
 #include "../include/design_selection.h"
+#include "../include/usable_shapes.h"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -24,9 +25,9 @@ using namespace std;
 void new_game(menu * parent)
 {
 
-	auto shapes = import_shapes();
+	//auto shapes = import_shapes();
 
-	if (shapes.size() == 0)
+	if (usable_shapes.size() == 0)
 		return;
 
 	parent->hide_menu();
@@ -36,7 +37,7 @@ void new_game(menu * parent)
 	
 	cout << "game address: " << &game_grid << endl;
 
-	game_grid.add_shapes(shapes);
+	game_grid.add_shapes(usable_shapes);
 	game_grid.init_sample();
 
 	game_grid.mainloop();

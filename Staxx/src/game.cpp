@@ -40,6 +40,7 @@ Uint32 callback_move_down(Uint32 interval, void * param)
 	return interval;
 }
 
+
 game::game(tile_colors colors, tile_colors default_on_colors)
 			: game_state(PLAY_SCREEN_TITLE, PLAY_SCREEN_X, PLAY_SCREEN_Y, PLAY_SCREEN_WIDTH, PLAY_SCREEN_HEIGHT), 
 				main_grid(PLAY_ROWS + 2, PLAY_COLS + 2, 
@@ -288,16 +289,55 @@ void game::move_active(move_type move, bool regular)
 	if (has_clash() && (move == curr_move))
 	{
 		set_active_tiles(main_grid, active_block);
-		vector<int> rows_idxes = get_full_rows();
-		active_block = nullptr;
-		if (rows_idxes.size() > 0)
-		{
-			flash_rows(rows_idxes);
 
-			score += main_grid.num_cols * rows_idxes.size() * rows_idxes.size();
+
+		void (game::* remove_func)(vector<int> &);
+		remove_func = nullptr;
+		//function<void(const vector<int> &)> remove_func;
+		vector<int> remove_idxes;
+		if (curr_move == DOWN_MV || curr_move == UP_MV)
+		{
+			remove_idxes = get_full_rows();
+			//remove_func = bind(&game::remove_rows, this);
+			remove_func = &game::remove_rows;
+			if (remove_idxes.size() == 0)
+			{
+				remove_idxes = get_full_cols();
+				remove_func = &game::remove_cols;
+			}
+		}
+		else if (curr_move == RIGHT_MV || curr_move == LEFT_MV)
+		{
+			remove_idxes = get_full_cols();
+			//remove_func = bind(&game::remove_cols, this);
+			remove_func = &game::remove_cols;
+			if (remove_idxes.size() == 0)
+			{
+				remove_idxes = get_full_rows();
+				remove_func = &game::remove_rows;
+			}
+		}
+		active_block = nullptr;
+		if (remove_idxes.size() > 0)
+		{
+			unsigned num_remove_dim;
+			if (remove_func == &game::remove_cols)
+			{
+				flash_cols(remove_idxes);
+				num_remove_dim = main_grid.num_rows;
+			}
+			else
+			{
+				flash_rows(remove_idxes);
+				num_remove_dim = main_grid.num_cols;
+			}
+
+			score += num_remove_dim * remove_idxes.size() * remove_idxes.size();
 			draw();
 		}
-		remove_rows(rows_idxes);
+		if (remove_func) {}
+			(this->*remove_func)(remove_idxes);
+		//remove_rows(remove_idxes);
 		sample_next();
 		if (has_clash())
 		{
@@ -368,6 +408,8 @@ void game::sample_next()
 	next_blocks.push_back(shared_ptr<block>(new block(generate_next_shape_ptr().get(), {100, 0, 0}, {0, 0, 100})));
 
 	curr_move = static_cast<move_type>(static_cast<int>(unif_real(gen) * 4));
+	//curr_move = UP_MV;
+	//curr_move = RIGHT_MV;   //mock object: REMOVE WHEN DONE
 
 	//SDL_RenderCopy(renderer, next_text_texture, NULL, &next_text_rect);
 }
@@ -445,15 +487,32 @@ void game::add_shapes(const shape_vec_type &shape_vec)
 	}
 }
 
-void game::remove_rows(const vector<int> rows_idxes)
+
+void game::remove_rows(vector<int> &rows_idxes)
 {
+	int row_incr;
+	int final_row_idx = main_grid.num_rows / 2;
+
+	sort_smaller_larger(rows_idxes);
+
 	for (auto &row_idx : rows_idxes)
 	{
-		for (int curr_row = row_idx; curr_row > 0; curr_row--)
+		if (row_idx < main_grid.num_rows/2)
+		{
+			row_incr = 1;
+		}
+		else
+		{
+			row_incr = -1;
+		}
+		/*
+		 * the condition for this for loop might have issues if the grid is very small (smaller than 3 rows)
+		*/
+		for (int curr_row = row_idx; curr_row != final_row_idx; curr_row = curr_row + row_incr)
 		{
 			for (int curr_col = 1; curr_col < main_grid.num_cols - 1; curr_col++)
 			{
-				main_grid.tiles[curr_row][curr_col] = move(main_grid.tiles[curr_row - 1][curr_col]);
+				main_grid.tiles[curr_row][curr_col] = move(main_grid.tiles[curr_row + row_incr][curr_col]);
 				//main_grid.tiles[curr_row - 1][curr_col].reset();
 				//main_grid.tiles[curr_row][curr_col].reset(main_grid.tiles[curr_row - 1][curr_col].release());
 				main_grid.tiles[curr_row][curr_col]->set_row_col(curr_row, curr_col);
@@ -463,20 +522,67 @@ void game::remove_rows(const vector<int> rows_idxes)
 		}
 		for (int curr_col = 1; curr_col < main_grid.num_cols - 1; curr_col++)
 		{
-			main_grid.tiles[0][curr_col] = make_shared<game_tile>(main_grid.x_offset + curr_col * main_grid.block_size,
-				main_grid.y_offset, main_grid.block_size, main_grid.block_size, main_grid.off_texture, main_grid.on_texture, renderer);
-			main_grid.tiles[0][curr_col]->set_row_col(0, curr_col);
+			main_grid.tiles[final_row_idx][curr_col] = make_shared<game_tile>(
+				main_grid.x_offset + curr_col * main_grid.block_size,
+				main_grid.y_offset + main_grid.block_size * final_row_idx, 
+				main_grid.block_size, main_grid.block_size, main_grid.off_texture, main_grid.on_texture, renderer);
+			main_grid.tiles[final_row_idx][curr_col]->set_row_col(1, curr_col);
 		}
 	}
 }
 
-void game::flash_rows(vector<int> row_idxes)
+void game::remove_cols(vector<int> &cols_idxes)
+{
+	int col_incr;
+	int	final_col_idx = main_grid.num_cols / 2;
+
+	sort_smaller_larger(cols_idxes);
+
+	for (auto &col_idx : cols_idxes)
+	{
+
+		if (col_idx < main_grid.num_cols / 2)
+		{
+			col_incr = 1;
+		}
+		else 
+		{
+			col_incr = -1;
+		}
+		for (int curr_col = col_idx; curr_col != final_col_idx; curr_col = curr_col + col_incr)
+		{
+			for (int curr_row = 1; curr_row < main_grid.tiles.size() - 1; curr_row++)
+			{
+				main_grid.tiles[curr_row][curr_col] = move(main_grid.tiles[curr_row][curr_col + col_incr]);
+				main_grid.tiles[curr_row][curr_col]->set_row_col(curr_row, curr_col);
+				main_grid.tiles[curr_row][curr_col]->set_coords(main_grid.x_offset + main_grid.block_size * curr_col, 
+					main_grid.y_offset + main_grid.block_size * curr_row);
+			}
+		}
+		for (int row_idx = 1; row_idx < main_grid.num_rows - 1; row_idx++)
+		{
+			main_grid.tiles[row_idx][final_col_idx] = make_shared<game_tile>(
+				main_grid.x_offset + final_col_idx * main_grid.block_size,
+				main_grid.y_offset + row_idx * main_grid.block_size, 
+				main_grid.block_size, main_grid.block_size, main_grid.off_texture,
+				main_grid.on_texture, renderer);
+
+			/*
+			main_grid.tiles[row_idx][1] = make_shared<game_tile>(first_col_coords[row_idx - 1].first, first_col_coords[row_idx - 1].second,
+				main_grid.block_size, main_grid.block_size, main_grid.off_texture, main_grid.on_texture, renderer);
+			*/
+			main_grid.tiles[row_idx][final_col_idx]->set_row_col(row_idx, final_col_idx);
+		}
+	}
+}
+
+void game::flash_rows(vector<int> idxes)
 {
 	SDL_RemoveTimer(timer_id);
 	lock = true;
 	for (int i = 0; i < 4; i++)
 	{
-		for (auto &row_idx : row_idxes)
+		for (auto &row_idx : idxes)
 		{
 			for (int col_idx = 1; col_idx < main_grid.num_cols - 1; col_idx++)
 			{
@@ -485,9 +591,38 @@ void game::flash_rows(vector<int> row_idxes)
 		}
 		draw();
 		SDL_Delay(100);
-		for (auto &row_idx : row_idxes)
+		for (auto &row_idx : idxes)
 		{
 			for (int col_idx = 1; col_idx < get_ncols() - 1; col_idx++)
+			{
+				main_grid.tiles[row_idx][col_idx]->set_activation_level(true);
+			}
+		}
+		draw();
+		SDL_Delay(100);
+	}
+	lock = false;
+	reset_timer();
+}
+
+void game::flash_cols(vector<int> idxes)
+{
+	SDL_RemoveTimer(timer_id);
+	lock = true;
+	for (int i = 0; i < 4; i++)
+	{
+		for (auto &col_idx : idxes)
+		{
+			for (int row_idx = 1; row_idx < main_grid.num_rows - 1; row_idx++)
+			{
+				main_grid.tiles[row_idx][col_idx]->set_activation_level(false);
+			}
+		}
+		draw();
+		SDL_Delay(100);
+		for (auto &col_idx : idxes)
+		{
+			for (int row_idx = 1; row_idx < main_grid.num_rows - 1; row_idx++)
 			{
 				main_grid.tiles[row_idx][col_idx]->set_activation_level(true);
 			}
@@ -503,12 +638,15 @@ void game::flash_rows(vector<int> row_idxes)
 
 vector<int> game::get_full_rows()
 {
-	int top_row = active_block->get_row();
-	int bottom_row = active_block->get_row() + active_block->get_height() - 1;
+	//int top_row = active_block->get_row();
+	//int bottom_row = active_block->get_row() + active_block->get_height() - 1;
+
+	int bottom_row = main_grid.num_rows - 1;
+	int top_row = 1;
 
 	vector<int> remove_rows;
 
-	for (int curr_row = top_row; curr_row <= bottom_row; curr_row++)
+	for (int curr_row = top_row; curr_row < bottom_row; curr_row++)
 	{
 		bool row_full = true;
 		for (int curr_col = 1; curr_col < get_ncols() - 1; curr_col++)
@@ -525,6 +663,31 @@ vector<int> game::get_full_rows()
 		}
 	}
 	return remove_rows;
+}
+
+vector<int> game::get_full_cols()
+{
+	int top_col = main_grid.num_cols - 1;
+	int bottom_col = 1;
+
+	vector<int> remove_cols;
+
+	for (int curr_col = bottom_col; curr_col < top_col; curr_col++)
+	{
+		bool full_row = true;
+		for (auto &row : main_grid.tiles)
+		{
+			if (!row[curr_col]->get_activation_level())
+			{
+				full_row = false;
+				break;
+			}
+		}
+		if (full_row)
+			remove_cols.push_back(curr_col);
+	}
+
+	return remove_cols;
 }
 
 void game::init_timer(Uint32 (* func_ptr)(Uint32, void *))
@@ -660,4 +823,27 @@ unsigned game::get_ncols()
 unsigned game::get_nrows()
 {
 	return main_grid.num_rows;
+}
+
+void game::sort_smaller_larger(vector<int> &vec)
+{
+	vector<int> smaller, larger;
+
+	for (auto &idx : vec)
+	{
+		if (idx < main_grid.num_rows / 2)
+		{
+			smaller.push_back(idx);
+		}
+		else
+		{
+			larger.push_back(idx);
+		}
+	}
+
+	sort(smaller.begin(), smaller.end(), [](int first, int second) {return first > second; });
+	sort(larger.begin(), larger.end(), [](int first, int second) {return first < second; });
+	vec.clear();
+	vec.insert(vec.end(), smaller.begin(), smaller.end());
+	vec.insert(vec.end(), larger.begin(), larger.end());
 }

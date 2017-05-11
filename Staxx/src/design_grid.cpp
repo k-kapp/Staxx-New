@@ -284,7 +284,10 @@ bool design_grid::design_valid()
 {
 	active_count = count_active();
 	if (active_count < 2)
+	{
+		cout << "design invalid" << endl;
 		return false;
+	}
 
 	vector<vector<visit_tile> > visited(num_rows, vector<visit_tile>(num_cols));
 
@@ -423,6 +426,7 @@ bool design_grid::design_valid()
 	}
 	if (visit_count < active_count)
 	{
+		cout << "design invalid" << endl;
 		return false;
 	}
 	else

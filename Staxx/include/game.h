@@ -39,9 +39,12 @@ public:
 	void move_active_right();
 	void rotate_active_right();
 	void move_active(move_type move, bool regular);
-	void remove_rows(const vector<int> rows_idxes);
+	void remove_rows(vector<int> &rows_idxes);
+	void remove_cols(vector<int> &cols_idxes);
 	void flash_rows(vector<int> row_idxes);
+	void flash_cols(vector<int> col_idxes);
 	vector<int> get_full_rows();
+	vector<int> get_full_cols();
 	shared_ptr<shape> generate_next_shape_ptr();
 	void set_borders();
 	void mainloop();
@@ -83,6 +86,8 @@ private:
 			}
 		}
 	}
+
+	void sort_smaller_larger(vector<int> &vec);
 
 private:
 	bool lock; 

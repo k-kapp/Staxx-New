@@ -17,7 +17,7 @@ private:
 	void update() override;
 	void draw() override;
 
-	void import_shapes();
+	void init_selection();
 
 	void cancel();
 	void save_selection();
