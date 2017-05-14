@@ -12,7 +12,7 @@ using namespace std;
 
 design_selection::design_selection(int grid_x, int grid_y)
 	: game_state("Design selection", 100, 100, 800, 600), 
-	scroller(2, 2, grid_x, grid_y, 20, 20, 120, textures.at("black"), renderer),
+	scroller(2, 2, grid_x, grid_y, 20, 20, 120, textures.at("black"), renderer, textures),
 	save_button(grid_x + (scroller.view_grid_width() - 100*2 - 50)/2, 
 		scroller.view_grid_higher_y() + 50, 100, 50, textures.at("dark red"), textures.at("red"),
 		textures.at("red"), 
@@ -29,13 +29,14 @@ design_selection::design_selection(int grid_x, int grid_y)
 
 void design_selection::init_selection()
 {
-	//vector<shared_ptr<shape> > shapes = ::import_shapes();
+	vector<shared_ptr<shape> > shapes = ::import_shapes();
 
 	vector<block> blocks;
 
-	for (auto &shape : all_shapes)
+	for (auto &shape : shapes)
 	{
-		blocks.push_back(block(shape.get(), { 200, 0, 0 }, { 50, 0, 0 }));
+		blocks.push_back(block(shape.get(), textures.at("red")));
+		//blocks.push_back(block(shape.get(), { 200, 0, 0 }, { 50, 0, 0 }));
 	}
 
 	grid<clickable_tile> texture_generator(8, 8, textures.at("black"), textures.at("red"), 0, 0, 25, 25, 0, 0, renderer);
@@ -73,17 +74,13 @@ void design_selection::update()
 
 void design_selection::draw()
 {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+
 	save_button.draw();
 	cancel_button.draw();
-
 	scroller.draw();
-	/*
-	for (auto &selector_ptr : selectors)
-	{
-		selector_ptr->draw();
-	}
-	
-	*/
+
 	SDL_RenderPresent(renderer);
 }
 

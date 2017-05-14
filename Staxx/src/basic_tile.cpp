@@ -147,8 +147,6 @@ void basic_tile::draw(SDL_Texture * target)
 
 void basic_tile::draw(SDL_Texture * target)
 {
-	SDL_SetRenderTarget(renderer, target);
-
 	if (activation_level)
 		SDL_RenderCopy(renderer, on_texture, NULL, &outer);
 	else
@@ -179,4 +177,9 @@ void basic_tile::decrease_activation_level()
 unsigned basic_tile::get_activation_level()
 {
 	return activation_level;
+}
+
+void basic_tile::reset_state()
+{
+	set_activation_level(0);
 }

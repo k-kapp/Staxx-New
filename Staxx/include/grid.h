@@ -115,6 +115,8 @@ public:
 
 	bool draw(SDL_Texture * target = nullptr)
 	{
+		SDL_Texture * prev_target = SDL_GetRenderTarget(renderer);
+		SDL_SetRenderTarget(renderer, target);
 		for (auto &row_vec : tiles)
 		{
 			for (auto &tl : row_vec)
@@ -122,6 +124,7 @@ public:
 				tl->draw(target);
 			}
 		}
+		SDL_SetRenderTarget(renderer, prev_target);
 		return true;
 	}
 
@@ -228,6 +231,7 @@ public:
 				else
 					activ_level = 0;
 				tiles.at(block_row + row_num).at(block_col + col_num)->set_activation_level(activ_level);
+				tiles.at(block_row + row_num).at(block_col + col_num)->set_on_texture(block_ptr->get_texture());
 			}
 		}
 	}
@@ -245,6 +249,7 @@ public:
 
 	SDL_Texture * create_texture(block * block_ptr, bool centered)
 	{
+
 		SDL_Texture * texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, num_cols * block_size, num_rows * block_size);
 
 		set_all_inactive();
@@ -287,6 +292,20 @@ public:
 	unsigned get_height()
 	{
 		return num_rows * (2 * padding_vert + block_size);
+	}
+
+	void set_coords(int x_coord, int y_coord)
+	{
+		int i = 0;
+		for (auto row_iter = tiles.begin(); row_iter != tiles.end(); advance(row_iter, 1), i++)
+		{
+			int j = 0;
+			for (int j = 0; j < num_cols; j++)
+			{
+				row_iter->set_coords(x_offset + padding_horiz*(1 + 2 * j) + j * block_size,
+					y_offset + padding_vert * (1 + 2 * i) + i * block_size);
+			}
+		}
 	}
 
 	bool draw_render();

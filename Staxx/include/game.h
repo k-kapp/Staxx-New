@@ -81,13 +81,16 @@ private:
 				if ((*set_block)(block_row, block_col))
 				{
 					grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_occupied();
-					grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_on_colors(set_block->colors);
+					//grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_on_colors(set_block->colors);
+					grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_on_texture(set_block->get_texture());
 				}
 			}
 		}
 	}
 
 	void sort_smaller_larger(vector<int> &vec);
+
+	SDL_Texture * get_new_move_texture();
 
 private:
 	bool lock; 
@@ -113,6 +116,7 @@ private:
 
 	SDL_Texture * next_texture;
 	SDL_Rect next_block_rect;
+	SDL_Rect next_dir_rect;
 
 	SDL_Rect next_text_rect;
 	SDL_Rect score_heading_rect;
@@ -126,7 +130,13 @@ private:
 
 	SDL_Texture * next_block_texture;
 
+	std::list<SDL_Texture *> next_block_textures;
+	std::list<move_type> next_move_dirs;
+	std::list<SDL_Texture *> next_move_textures;
+
 	move_type curr_move;
+
+	std::vector<std::string> texture_names;
 
 };
 

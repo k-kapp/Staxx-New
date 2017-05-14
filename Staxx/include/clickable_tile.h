@@ -63,6 +63,8 @@ public:
 
 	void set_sticky(bool setting);
 
+	virtual void reset_state() override;
+
 protected:
 	SDL_Texture * hover_texture;   //NOTE: creator of clickable tile object (or its derivative classes) is 
 											   // responsible for destroying off_texture and on_texture. i.e. clickable_tile

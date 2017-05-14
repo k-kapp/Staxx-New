@@ -193,3 +193,8 @@ void clickable_tile::set_sticky(bool setting)
 	sticky = setting;
 }
 
+void clickable_tile::reset_state()
+{
+	basic_tile::reset_state();
+	mousebutton_down = false;
+}

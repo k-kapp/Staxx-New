@@ -38,6 +38,8 @@ public:
 	void decrease_activation_level();
 
 	unsigned get_activation_level();
+
+	virtual void reset_state();
 protected:
 
 	SDL_Renderer * renderer;

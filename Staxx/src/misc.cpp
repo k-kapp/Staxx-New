@@ -144,7 +144,7 @@ SDL_Surface * make_surface_from_colors(tile_colors colors, int width, int height
 			{
 				pixel_color = SDL_MapRGB(surface->format, colors.base.red, colors.base.green, colors.base.blue);
 			}
-			((Uint32*)surface->pixels)[row_idx * (surface->pitch / 4) + col_idx] = pixel_color;
+			((Uint32*)surface->pixels)[row_idx * (surface->pitch / sizeof(Uint32)) + col_idx] = pixel_color;
 		}
 	}
 	return surface;
@@ -177,4 +177,115 @@ SDL_Texture * make_default_off_texture(SDL_Renderer * renderer)
 	off_colors.border.red = off_colors.border.green = off_colors.border.blue = 0;
 
 	return make_texture_from_colors(off_colors, PLAY_BLOCK_SIZE, PLAY_BLOCK_SIZE, renderer);
+}
+
+SDL_Surface * make_up_arrow(unsigned width, unsigned height, color col)
+{
+	SDL_Surface * new_surface = SDL_CreateRGBSurface(0, width, height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+	for (int row_idx = 0; row_idx < new_surface->h; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < new_surface->w; col_idx++)
+		{
+			Uint32 pixel_color;
+			if (col_idx >= width / 2 - row_idx / 2 && col_idx <= width / 2 + row_idx / 2)
+			{
+				pixel_color = SDL_MapRGB(new_surface->format, col.red, col.green, col.blue);
+			}
+			else
+			{
+				pixel_color = SDL_MapRGB(new_surface->format, 0, 0, 0);
+			}
+			((Uint32*)new_surface->pixels)[row_idx * new_surface->pitch / sizeof(Uint32) + col_idx] = pixel_color;
+		}
+	}
+
+	return new_surface;
+}
+
+void rotate_surface_clockwise(SDL_Surface * surface)
+{
+	for (int row_idx = 0; row_idx < surface->h / 2; row_idx++)
+	{
+		int up_left_edge_idx = row_idx * surface->pitch / sizeof(Uint32) + row_idx;
+		int up_right_edge_idx = row_idx * surface->pitch / sizeof(Uint32) + surface->w - row_idx - 1;
+		int low_right_edge_idx = (surface->h - row_idx - 1) * surface->pitch / sizeof(Uint32) + surface->w - row_idx - 1;
+		int low_left_edge_idx = (surface->h - row_idx - 1) * surface->pitch / sizeof(Uint32) + row_idx;
+
+		for (int col_idx = 0; col_idx < surface->w - 2*row_idx - 1; col_idx++)
+		{
+			int top_change_idx = up_left_edge_idx + col_idx;
+			int right_change_idx = up_right_edge_idx + col_idx*surface->pitch / sizeof(Uint32);
+			int bottom_change_idx = low_right_edge_idx - col_idx;
+			int left_change_idx = low_left_edge_idx - col_idx * surface->pitch / sizeof(Uint32);
+
+			Uint32 top_change = ((Uint32*)surface->pixels)[top_change_idx];
+			Uint32 right_change = ((Uint32*)surface->pixels)[right_change_idx];
+			Uint32 bottom_change = ((Uint32*)surface->pixels)[bottom_change_idx];
+			Uint32 left_change = ((Uint32*)surface->pixels)[left_change_idx];
+
+			((Uint32*)surface->pixels)[right_change_idx] = top_change;
+			((Uint32*)surface->pixels)[bottom_change_idx] = right_change;
+			((Uint32*)surface->pixels)[left_change_idx] = bottom_change;
+			((Uint32*)surface->pixels)[top_change_idx] = left_change;
+
+		}
+	}
+}
+
+SDL_Surface * rotate_copy_surface_clockwise(SDL_Surface * surface)
+{
+	SDL_Surface * new_surface = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	SDL_BlitSurface(surface, NULL, new_surface, NULL);
+
+	rotate_surface_clockwise(new_surface);
+
+	return new_surface;
+}
+
+void mult_surface(SDL_Surface * surface, color col)
+{
+	for (int row_idx = 0; row_idx < surface->w; row_idx++)
+	{
+		for (int col_idx = 0; col_idx < surface->h; col_idx++)
+		{
+			int idx = row_idx * surface->pitch / sizeof(Uint32) + col_idx;
+			Uint32 pixel_val = ((Uint32*)surface->pixels)[idx];
+			
+			Uint8 r, g, b;
+			SDL_GetRGB(pixel_val, surface->format, &r, &g, &b);
+			unsigned red = r;
+			unsigned green = g;
+			unsigned blue = b;
+
+			red = ((float)red / 255 * (float)col.red / 255) * 255;
+			green = ((float)green / 255 * (float)col.green / 255) * 255;
+			blue = ((float)blue / 255 * (float)col.blue / 255) * 255;
+
+			Uint32 new_pixel_val = SDL_MapRGB(surface->format, red, green, blue);
+
+			((Uint32*)surface->pixels)[idx] = new_pixel_val;
+		}
+	}
+}
+
+SDL_Surface *  mult_copy_surface(SDL_Surface * surface, color col)
+{
+	SDL_Surface * new_surface = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+
+	SDL_BlitSurface(surface, NULL, new_surface, NULL);
+
+	mult_surface(new_surface, col);
+
+	return new_surface;
+}
+
+vector<SDL_Surface *> get_all_rotations(SDL_Surface * surface)
+{
+	vector<SDL_Surface *> surfaces = { surface };
+
+	for (int i = 0; i < 3; i++)
+		surfaces.push_back(rotate_copy_surface_clockwise(surfaces.back()));
+
+	return surfaces;
 }

@@ -27,9 +27,24 @@ SDL_Texture * make_button_texture(unsigned width, unsigned height, std::string t
 
 	//where is SDL_PIXELFORMAT_RGBA32???
 	SDL_Texture * texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, width, height);
-	TTF_Font * font = TTF_OpenFont(FONT_FILEPATH, 30);
+	TTF_Font * font = TTF_OpenFont(FONT_FILEPATH, 17);
+
+	int font_width, font_height;
+	TTF_SizeText(font, text.c_str(), &font_width, &font_height);
+
+	font_height *= 3;
+
+	if ((unsigned)font_width > 0.8 * width)
+	{
+		font_width = 0.8 * width;
+	}
+	if ((unsigned)font_height > height)
+	{
+		font_height = height;
+	}
+
 	SDL_Surface * text_surface = TTF_RenderText_Solid(font, text.c_str(), { 255, 255, 255 });
-	SDL_Surface * scaled_surface = SDL_CreateRGBSurface(0, width*0.8, height*0.8, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+	SDL_Surface * scaled_surface = SDL_CreateRGBSurface(0, font_width, font_height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 
 	SDL_BlitScaled(text_surface, NULL, scaled_surface, NULL);
 	//SDL_FreeSurface(text_surface);
@@ -43,12 +58,13 @@ SDL_Texture * make_button_texture(unsigned width, unsigned height, std::string t
 	SDL_Rect dest_rect;
 	dest_rect.w = scaled_surface->w;
 	dest_rect.h = scaled_surface->h;
-	dest_rect.x = width*0.1;
-	dest_rect.y = height*0.1;
+	dest_rect.x = (width - scaled_surface->w)/2;
+	dest_rect.y = (height - scaled_surface->h)/2;
 	//SDL_FreeSurface(scaled_surface);
 
 	SDL_RenderCopy(renderer, background_texture, NULL, NULL);
 	SDL_RenderCopy(renderer, text_texture, NULL, &dest_rect);
+	//SDL_RenderCopy(renderer, text_texture, NULL, NULL);
 	SDL_SetRenderTarget(renderer, NULL);
 
 	SDL_FreeSurface(scaled_surface);

@@ -110,6 +110,7 @@ void game_tile::update()
 		if (is_active())
 		{
 			set_activation_level(true);
+			set_on_texture(active_block->get_texture());
 			return;
 		}
 	}

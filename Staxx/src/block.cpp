@@ -4,18 +4,30 @@
 
 
 block::block(shape * design, color base_col, color border_col)
-			: design(design)
+			: design(design), colors({base_col, border_col})
 {
-	curr_orient = UP;
-	colors.base = base_col;
-	colors.border = border_col;
-	row = design->get_vert_padding().first;
-	col = design->get_horiz_padding().first;
+	tile_colors cols;
+	cols.base = base_col;
+	cols.border = border_col;
+	init_vars();
+}
+
+block::block(shape * design, SDL_Texture * texture)
+	: design(design), texture(texture)
+{
+	init_vars();
 }
 
 bool block::operator () (int row, int col)
 {
 	return design->get_coords(row, col, curr_orient);
+}
+
+void block::init_vars()
+{
+	curr_orient = UP;
+	row = design->get_vert_padding().first;
+	col = design->get_horiz_padding().first;
 }
 
 orient block::get_curr_orient()
@@ -156,4 +168,9 @@ void block::reverse_previous()
 			rotate_right(true);
 		} break;
 	}
+}
+
+SDL_Texture * block::get_texture()
+{
+	return texture;
 }

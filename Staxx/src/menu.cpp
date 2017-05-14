@@ -266,6 +266,7 @@ void menu::set_button_callback(string button_title, function<void()> callback)
 
 void menu::show_menu()
 {
+	reset_buttons_states();
 	SDL_ShowWindow(window);
 }
 
@@ -353,4 +354,12 @@ void menu::draw()
 void menu::update()
 {
 	update_buttons();
+}
+
+void menu::reset_buttons_states()
+{
+	for (auto &bt : buttons)
+	{
+		bt.reset_state();
+	}
 }

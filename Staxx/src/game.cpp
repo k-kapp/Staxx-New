@@ -4,6 +4,7 @@
 #include "../include/game.h"
 #include "../include/clickable_tile.h"
 #include "../include/constants.h"
+#include "../include/common_surfaces.h"
 
 #include <SDL2/SDL.h>
 #include <vector>
@@ -55,10 +56,9 @@ game::game(tile_colors colors, tile_colors default_on_colors)
 				delay(INIT_DELAY), 
 				score(0), 
 				active_block(nullptr), 
-				next_texture(SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGB24, SDL_TEXTUREACCESS_TARGET, 8 * PLAY_BLOCK_SIZE / 2, 8 * PLAY_BLOCK_SIZE / 2)),
+				next_texture(SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 8 * PLAY_BLOCK_SIZE / 2, 8 * PLAY_BLOCK_SIZE / 2)),
 				gen(chrono::steady_clock::now().time_since_epoch().count())
 {
-
 	int block_size = PLAY_BLOCK_SIZE;
 
 	this->game_over = false;
@@ -67,12 +67,17 @@ game::game(tile_colors colors, tile_colors default_on_colors)
 	int end_y = PLAY_ROWS*block_size + PLAY_SCREEN_Y;
 
 	//next_grid = grid<game_tile>(8, 8, main_grid.off_texture, main_grid.on_texture, NEXT_GRID_X, NEXT_GRID_Y, NEXT_GRID_BLOCK_SIZE, 1, renderer);
-	next_grid = grid<game_tile>(8, 8, textures.at("black"), main_grid.on_texture, 0, 0, NEXT_GRID_BLOCK_SIZE, 1, 0, 0, renderer);
+	next_grid = grid<game_tile>(8, 8, textures.at("black:gray"), main_grid.on_texture, 0, 0, NEXT_GRID_BLOCK_SIZE, 1, 0, 0, renderer);
 
 	next_block_rect.x = NEXT_GRID_X;
 	next_block_rect.y = NEXT_GRID_Y;
 	next_block_rect.w = NEXT_GRID_COLS*NEXT_GRID_BLOCK_SIZE;
 	next_block_rect.h = NEXT_GRID_ROWS*NEXT_GRID_BLOCK_SIZE;
+
+	next_dir_rect.w = NEXT_ARROW_SIZE;
+	next_dir_rect.h = NEXT_ARROW_SIZE;
+	next_dir_rect.x = next_block_rect.x + (next_block_rect.w - next_dir_rect.w) / 2;
+	next_dir_rect.y = next_block_rect.y + next_block_rect.h + next_block_rect.h*0.1;
 
 	assign_row_col_nums();
 	set_borders();
@@ -209,7 +214,7 @@ void game::set_borders()
 
 void game::draw()
 {
-
+	SDL_SetRenderTarget(renderer, NULL);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 
@@ -217,9 +222,9 @@ void game::draw()
 
 	SDL_RenderCopy(renderer, score_heading_texture, NULL, &score_heading_rect);
 	render_score_texture();
-
-	SDL_RenderCopy(renderer, next_block_texture, NULL, &next_block_rect);
+	SDL_RenderCopy(renderer, next_block_textures.front(), NULL, &next_block_rect);
 	SDL_RenderCopy(renderer, next_text_texture, NULL, &next_text_rect);
+	SDL_RenderCopy(renderer, next_move_textures.front(), NULL, &next_dir_rect);
 
 	SDL_RenderPresent(renderer);
 }
@@ -252,7 +257,7 @@ bool game::has_clash()
 
 void game::move_active(move_type move, bool regular)
 {
-	draw();
+	//draw();
 
 	//print_main_occupied();
 
@@ -289,7 +294,6 @@ void game::move_active(move_type move, bool regular)
 	if (has_clash() && (move == curr_move))
 	{
 		set_active_tiles(main_grid, active_block);
-
 
 		void (game::* remove_func)(vector<int> &);
 		remove_func = nullptr;
@@ -339,6 +343,7 @@ void game::move_active(move_type move, bool regular)
 			(this->*remove_func)(remove_idxes);
 		//remove_rows(remove_idxes);
 		sample_next();
+		//next_grid.draw();
 		if (has_clash())
 		{
 			game_over = true;
@@ -392,26 +397,69 @@ shared_ptr<shape> game::generate_next_shape_ptr()
 
 void game::init_sample()
 {
+	/*
 	for (int i = 0; i < 2; i++)
 	{
 		auto next_block = shared_ptr<block>(new block(generate_next_shape_ptr().get(), {100, 0, 0}, {0, 0, 100}));
 		next_blocks.push_back(next_block);
 	}
+	*/
+	sample_next();
 	sample_next();
 }
 
 void game::sample_next()
 {
+	/*
 	set_main_active(next_blocks.front());
 	next_blocks.pop_front();
+	*/
 
-	next_blocks.push_back(shared_ptr<block>(new block(generate_next_shape_ptr().get(), {100, 0, 0}, {0, 0, 100})));
+	string next_color_str = block_texture_names.at(static_cast<int>(unif_real(gen) * block_texture_names.size()));
 
-	curr_move = static_cast<move_type>(static_cast<int>(unif_real(gen) * 4));
-	//curr_move = UP_MV;
-	//curr_move = RIGHT_MV;   //mock object: REMOVE WHEN DONE
+	next_blocks.push_back(shared_ptr<block>(new block(generate_next_shape_ptr().get(), textures.at(next_color_str))));
+	next_block_textures.push_back(next_grid.create_texture(next_blocks.back().get(), true));
+	next_move_dirs.push_back(static_cast<move_type>(static_cast<int>(unif_real(gen) * 4)));
+	next_move_textures.push_back(get_new_move_texture());
 
-	//SDL_RenderCopy(renderer, next_text_texture, NULL, &next_text_rect);
+	if (next_move_dirs.size() > 1)
+	{
+		curr_move = next_move_dirs.front();
+		next_move_dirs.pop_front();
+	}
+
+	if (next_move_textures.size() > 1)
+	{
+		next_move_textures.pop_front();
+	}
+
+	if (next_blocks.size() > 1)
+	{
+		set_main_active(next_blocks.front());
+		next_blocks.pop_front();
+	}
+
+	if (next_block_textures.size() > 1)
+	{
+		next_block_textures.pop_front();
+	}
+}
+
+SDL_Texture * game::get_new_move_texture()
+{
+	switch (next_move_dirs.back())
+	{
+	case (UP_MV):
+		return textures.at("up arrow:red");
+	case (RIGHT_MV):
+		return textures.at("right arrow:red");
+	case (DOWN_MV):
+		return textures.at("down arrow:red");
+	case (LEFT_MV):
+		return textures.at("left arrow:red");
+	default:
+		return nullptr;
+	}
 }
 
 void game::set_main_active(shared_ptr<block> next_active)
@@ -431,15 +479,20 @@ void game::set_main_active(shared_ptr<block> next_active)
 
 	//shared_ptr<block> next_block = make_shared<block>(*active_block);
 	shared_ptr<block> next_block = make_shared<block>(*next_blocks.back());
-	set_next_active(next_block);
+	//set_next_active(next_block);
 
+	/*
 	SDL_SetRenderTarget(renderer, next_texture);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	SDL_SetRenderTarget(renderer, nullptr);
-	next_grid.draw(next_texture);
+	*/
 
-	print_next_occupied();
+	//next_grid.draw(next_texture);
+
+	//next_grid.draw();
+
+	//print_next_occupied();
 }
 
 /*
@@ -469,8 +522,12 @@ void game::set_next_active(shared_ptr<block> next_active)
 
 void game::set_next_active(shared_ptr<block> next_active)
 {
-	SDL_DestroyTexture(next_block_texture);
-	next_block_texture = next_grid.create_texture(next_active.get(), true);
+	
+	if (next_block_textures.size() > 0)
+		next_block_textures.pop_front();
+	next_block_textures.push_back(next_grid.create_texture(next_active.get(), true));
+	
+	//next_block_texture = next_grid.create_texture(next_active.get(), true);
 }
 
 void game::add_shape(const shared_ptr<shape> &shape_ptr)
@@ -526,7 +583,7 @@ void game::remove_rows(vector<int> &rows_idxes)
 				main_grid.x_offset + curr_col * main_grid.block_size,
 				main_grid.y_offset + main_grid.block_size * final_row_idx, 
 				main_grid.block_size, main_grid.block_size, main_grid.off_texture, main_grid.on_texture, renderer);
-			main_grid.tiles[final_row_idx][curr_col]->set_row_col(1, curr_col);
+			main_grid.tiles[final_row_idx][curr_col]->set_row_col(final_row_idx, curr_col);
 		}
 	}
 }
@@ -796,14 +853,16 @@ void game::mainloop()
 				default:
 				{}
 			}
-
+			
 
 			quit = quit || game_over;
 		}
 		if (active_block)
 		{
-			//cout << "drawing and updating..." << endl;
+			// update function simply sets tiles under active block to occupied, if
+			// not already occupied
 			update();
+
 			draw();
 		}
 		if (quit)

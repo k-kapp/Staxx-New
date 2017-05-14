@@ -53,7 +53,7 @@ private:
 		ar & down;
 		ar & left;
 		ar & horiz_padding;
-		//ar & vert_padding;
+		ar & vert_padding;
 	}
 
 	bool_2d orig_arr;

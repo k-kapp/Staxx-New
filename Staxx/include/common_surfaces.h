@@ -31,3 +31,5 @@ private:
 void init_surfaces(common_surfaces &surfaces);
 
 extern common_surfaces all_surfaces;
+
+extern std::vector<std::string> block_texture_names;

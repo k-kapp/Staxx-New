@@ -30,6 +30,8 @@ extern const int NEXT_GRID_COLS;
 extern const int NEXT_GRID_X;
 extern const int NEXT_GRID_Y;
 
+extern const int NEXT_ARROW_SIZE;
+
 extern const int PLAY_ROWS;
 extern const int PLAY_COLS;
 

@@ -65,6 +65,8 @@ public:
 
 	void set_buttons_size(unsigned width, unsigned height);
 
+	void reset_buttons_states();
+
 protected:
 
 	void draw() override;

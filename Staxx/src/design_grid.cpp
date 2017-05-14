@@ -531,7 +531,6 @@ void design_grid::quit_design()
 	quit = true;
 }
 
-
 void design_grid::draw()
 {
 	tiles.draw();

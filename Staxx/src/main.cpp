@@ -33,7 +33,7 @@ void new_game(menu * parent)
 	parent->hide_menu();
 
 	int speed_inv = 700;
-	game game_grid({ {0, 100, 0}, {0, 100, 0} }, { {255, 0, 0}, {200, 0, 0} });
+	game game_grid({ {0, 0, 0}, {100, 100, 100} }, { {112, 128, 144}, {159, 182, 205} });
 	
 	cout << "game address: " << &game_grid << endl;
 
@@ -108,8 +108,8 @@ int main(int argc, char * argv [])
 	main_menu.set_buttons_colors(button_off, button_hover, button_on);
 
 	main_menu.set_heading_rect({100, 100, 200, 200});
-	main_menu.set_buttons_size(100, 50);
-	main_menu.align_buttons_heading_vert(30);
+	main_menu.set_buttons_size(400, 50);
+	main_menu.align_buttons_heading_vert(20);
 	main_menu.align_buttons_heading_horiz();
 
 	main_menu.mainloop();

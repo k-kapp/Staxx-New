@@ -10,6 +10,7 @@ class block
 {
 public:
 	block(shape * design, color base_col, color border_col);
+	block(shape * design, SDL_Texture * texture);
 	orient get_curr_orient();
 	bool_2d get_curr_state();
 
@@ -26,15 +27,20 @@ public:
 	void reverse_previous();
 	move_type get_last_move();
 	bool active_pos(int row, int col);
+	SDL_Texture * get_texture();
 
 	bool operator () (int, int);
 
 	tile_colors colors;
 
 private:
+	void init_vars();
+
 	orient curr_orient;
 	shape * design;
 	move_type last_move;
+
+	SDL_Texture * texture;
 
 	int row, col;
 };
