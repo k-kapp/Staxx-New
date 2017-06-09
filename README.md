@@ -9,19 +9,16 @@ Note that I did not use a UI API for the buttons, etc. I only used SDL2. Therefo
 
 Should be compilable with Visual Studio 2015. SDL2 should also be referenced in the project, as well as the boost libraries.
 
-Some screenshots follow:
+Some screenshots follow. The first is of gameplay, the second of the design grid, and the third screenshot is the main menu:
 
 <p align="center">
 <img src="Game.png" width="650">
-Gameplay screenshot
 </p>
 
 <p align="center">
 <img src="Design.png" width="500">
-The design grid
 </p>
 
 <p align="center">
 <img src="MainMenu.png" width="350">
-Main menu
 </p>
