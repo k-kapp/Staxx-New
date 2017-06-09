@@ -13,12 +13,15 @@ Some screenshots follow:
 
 <p align="center">
 <img src="Game.png" width="650">
+Gameplay screenshot
 </p>
 
 <p align="center">
 <img src="Design.png" width="500">
+The design grid
 </p>
 
 <p align="center">
 <img src="MainMenu.png" width="350">
+Main menu
 </p>
