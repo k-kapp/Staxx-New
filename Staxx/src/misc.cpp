@@ -127,8 +127,6 @@ vector<shared_ptr<shape> > import_shapes()
 
 SDL_Surface * make_surface_from_colors(tile_colors colors, int width, int height)
 {
-	//SDL_Texture * new_texture = SDL_CreateTexture(renderer, SDL_TEXTURE_FORMAT, SDL_TEXTUREACCESS_STATIC, width, height);
-	//SDL_Surface * surface = SDL_CreateRGBSurfaceWithFormat(0, width, height, 24, SDL_TEXTURE_FORMAT);
 	SDL_Surface * surface = SDL_CreateRGBSurface(0, width, height, 24, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x00000000);
 
 	for (int row_idx = 0; row_idx < height; row_idx++)

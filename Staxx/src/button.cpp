@@ -47,7 +47,6 @@ SDL_Texture * make_button_texture(unsigned width, unsigned height, std::string t
 	SDL_Surface * scaled_surface = SDL_CreateRGBSurface(0, font_width, font_height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 
 	SDL_BlitScaled(text_surface, NULL, scaled_surface, NULL);
-	//SDL_FreeSurface(text_surface);
 
 	SDL_Texture * text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
 
@@ -60,11 +59,9 @@ SDL_Texture * make_button_texture(unsigned width, unsigned height, std::string t
 	dest_rect.h = scaled_surface->h;
 	dest_rect.x = (width - scaled_surface->w)/2;
 	dest_rect.y = (height - scaled_surface->h)/2;
-	//SDL_FreeSurface(scaled_surface);
 
 	SDL_RenderCopy(renderer, background_texture, NULL, NULL);
 	SDL_RenderCopy(renderer, text_texture, NULL, &dest_rect);
-	//SDL_RenderCopy(renderer, text_texture, NULL, NULL);
 	SDL_SetRenderTarget(renderer, NULL);
 
 	SDL_FreeSurface(scaled_surface);
@@ -103,7 +100,6 @@ button::button(int x_coord, int y_coord, unsigned width, unsigned height, SDL_Te
 	: clickable_tile(x_coord, y_coord, width, height, off_texture, hover_texture, on_texture, renderer), callback(callback)
 
 {
-	//must_click_on_this = true;
 	activate_on_release = true;
 }
 
@@ -117,7 +113,6 @@ button::button(int x_coord, int y_coord, unsigned width, unsigned height, tile_c
 		callback, renderer)
 {
 	std::cout << "text_buffer_x in ctor: " << text_buffer_x << endl;
-	//set_text(text);
 	this->text = text;
 	std::cout << "exiting ctor" << endl;
 }
@@ -129,14 +124,6 @@ button::button(button &&other) noexcept
 	text = other.text;
 }
 
-/*
-button::button(button &other)
-	: button(move(other))
-{
-	cout << "cannot call button copy constructor" << endl;
-	throw new exception();
-}
-*/
 
 button &button::operator=(button &&other) noexcept
 {
@@ -149,15 +136,6 @@ button &button::operator=(button &&other) noexcept
 
 	return *this;
 }
-
-/*
-button &button::operator=(button &other)
-{
-	cout << "cannot call button copy assignment operator" << endl;
-	throw new exception();
-	return *this;
-}
-*/
 
 button::~button()
 {
@@ -180,9 +158,6 @@ void button::update()
 void button::set_size(unsigned width, unsigned height)
 {
 	basic_tile::set_size(width, height);
-
-	//fix_text_size();
-	//set_message_rect();
 }
 
 void button::set_callback(function<void()> callback)
@@ -205,121 +180,4 @@ void button::set_on_texture(SDL_Texture * texture)
 {
 	on_texture = make_button_texture(width, height, text, texture, renderer);
 }
-
-/*
-void button::draw(SDL_Texture * target)
-{
-	clickable_tile::draw(target);
-
-	if (text_texture)
-	{
-		SDL_SetRenderTarget(renderer, target);
-
-		set_message_rect();
-		if (SDL_RenderCopy(renderer, text_texture, NULL, &message_rect))
-		{
-			ostringstream ostring;
-			ostring << "Error rendering button text" << endl;
-			ostring << "message_rect: x: " << to_string(message_rect.x) << ", y:" << to_string(message_rect.y) << ", w: " << to_string(message_rect.w)
-				<< ", h: " << to_string(message_rect.h) << endl;
-			if (!renderer)
-			{
-				cout << "renderer not initialized" << endl;
-			}
-
-			string err_string = ostring.str();
-
-			cout << err_string << endl;
-
-			throw new exception();
-		}
-
-		SDL_SetRenderTarget(renderer, nullptr);
-	}
-}
-*/
-
-/*
-void button::init_text()
-{	
-	SDL_Surface * text_surface;
-
-	font = TTF_OpenFont("fonts/ARCADECLASSIC.TTF", 30);
-	TTF_SizeText(font, text.c_str(), &text_w, &text_h);
-
-	int text_width = text_w + 10;
-	int text_height = text_h + 10;
-
-	fix_text_size();
-
-	cout << "in init_texture" << endl;
-	cout << "text buffer x: " << text_buffer_x << endl;
-	cout << "text_w: " << text_w << endl;
-	cout << "width: " << width << endl;
-
-	text_surface = TTF_RenderText_Solid(font, text.c_str(), {255, 255, 255});
-	text_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
-	set_message_rect();
-
-	if (!text_texture)
-	{
-		cout << "Could not create text texture" << endl;
-	}
-
-	SDL_FreeSurface(text_surface);
-	//SDL_DestroyTexture(text_texture);
-}
-*/
-
-/*
-void button::fix_text_size()
-{
-	TTF_SizeText(font, text.c_str(), &text_w, &text_h);
-
-	if (text_w > (int)width - text_buffer_x*2)
-	{
-		text_w = (int)width - text_buffer_x*2;
-	}
-	else
-	{
-		text_buffer_x = ((int)width - text_w) / 2;
-	}
-
-	if (text_h > (int)height - text_buffer_y * 2)
-	{
-		text_h = (int)width - text_buffer_y * 2;
-	}
-	else
-	{
-		text_buffer_y = ((int)height - text_h) / 2;
-	}
-
-}
-*/
-
-
-/*
-void button::set_message_rect()
-{
-	message_rect = {x_coord + text_buffer_x, y_coord + text_buffer_y, text_w, text_h};
-
-	//cout << "message_rect: x: " << to_string(message_rect.x) << ", y:" << to_string(message_rect.y) << ", w: " << to_string(message_rect.w)
-	//	<< ", h: " << to_string(message_rect.h) << endl;
-}
-*/
-
-/*
-void button::set_text(std::string text)
-{
-	this->text = text;
-	init_text();
-}
-*/
-
-/*
-string button::get_text()
-{
-	return text;
-}
-*/
 

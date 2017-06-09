@@ -4,13 +4,16 @@
 #include <SDL2/SDL.h>
 #include <utility>
 
+/*
+ * base class for all tile-like objects. These include tiles on the playing board and various kinds of buttons. 
+ */
+
 class basic_tile
 {
 public:
 
 	basic_tile(int x_coord, int y_coord, unsigned x_size, unsigned y_size, SDL_Texture * off_texture, SDL_Texture * on_texture,
 				SDL_Renderer * renderer);
-	//basic_tile(int x_coord, int y_coord, unsigned x_size, unsigned y_size, tile_colors back_colors, tile_colors fore_colors, SDL_Renderer * renderer);
 	basic_tile(const basic_tile &other);
 	basic_tile & operator = (const basic_tile &other);
 

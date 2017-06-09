@@ -22,6 +22,11 @@ typedef enum _orient
 	LEFT
 } orient;
 
+/*
+ * A shape object contains stateless information about a specific shape used in the game, such as its appearance,
+ * width and height for each orientation, mainly. It does not contain info on a position on the screen or on a grid, for
+ * example.
+ */
 
 class shape
 {

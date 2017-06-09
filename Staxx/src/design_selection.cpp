@@ -36,7 +36,6 @@ void design_selection::init_selection()
 	for (auto &shape : shapes)
 	{
 		blocks.push_back(block(shape.get(), textures.at("red")));
-		//blocks.push_back(block(shape.get(), { 200, 0, 0 }, { 50, 0, 0 }));
 	}
 
 	grid<clickable_tile> texture_generator(8, 8, textures.at("black"), textures.at("red"), 0, 0, 25, 25, 0, 0, renderer);
@@ -48,7 +47,6 @@ void design_selection::init_selection()
 		SDL_Texture * off_texture = texture_generator.create_texture(&block, true);
 		texture_generator.set_background(textures.at("dark gray"));
 		SDL_Texture * on_texture = texture_generator.create_texture(&block, true);
-		//selectors.emplace_back(coords[i].first, coords[i].second, 300, 200, off_texture, off_texture, on_texture, renderer);
 		selectors.push_back(make_shared<clickable_tile>(0, 0, 300, 200, off_texture, off_texture, on_texture, renderer));
 		selectors.back()->set_sticky(true);
 		if (i == 0)
@@ -59,12 +57,6 @@ void design_selection::init_selection()
 
 void design_selection::update()
 {
-	/*
-	for (auto &selector_ptr : selectors)
-	{
-		selector_ptr->update();
-	}
-	*/
 
 	save_button.update();
 	cancel_button.update();

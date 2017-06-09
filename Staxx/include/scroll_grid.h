@@ -11,6 +11,11 @@
 #include <iostream>
 #include <map>
 
+/*
+ * Has similarities to the grid type, but here we can also display only a part of the grid on the screen,
+ * then we scroll up and down to reveal other parts of the grid (like a normal scroller, more or less).
+*/
+
 template<typename T>
 class scroll_grid
 {

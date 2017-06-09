@@ -15,30 +15,11 @@ class shape_phys;
 
 class block;
 
-
 /*
- * Handles all draw functions related to the tile
- */
-class tile_artist
-{
-public:
-	clickable_tile * parent;
+ * base class for all types of tiles that have some function when clicked. This includes
+ * buttons and "drawing" tiles to design new shapes
+*/
 
-	SDL_Rect inner;
-	SDL_Rect outer;
-	
-	void draw(block * block_obj);
-	void erase();  //empty function
-
-	tile_artist(clickable_tile * parent);
-};
-
-/*
- * manager for each tile. also contains info on where on the grid
- * the tile is (which row and column number). contains information on
- * the occupant. the occupant is responsible for the color of the tile if occupied,
- * while the grid is responsible if empty
- */
 class clickable_tile : public basic_tile
 {
 public:

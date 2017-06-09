@@ -29,18 +29,6 @@ void init_surfaces(common_surfaces &surfaces)
 	auto red_arrow_rotations = get_all_rotations(up_red_arrow);
 	auto dark_red_arrow_rotations = get_all_rotations(up_dark_red_arrow);
 
-	/*
-	SDL_Surface * up_arrow = make_up_arrow(200, 200, { 255, 0, 0 });
-	SDL_Surface * right_arrow = rotate_copy_surface_clockwise(up_arrow);
-	SDL_Surface * down_arrow = rotate_copy_surface_clockwise(right_arrow);    
-	SDL_Surface * left_arrow = rotate_copy_surface_clockwise(down_arrow);
-
-	all_surfaces.add_surface("up arrow:red", up_arrow);
-	all_surfaces.add_surface("right arrow:red", right_arrow);
-	all_surfaces.add_surface("down arrow:red", down_arrow);
-	all_surfaces.add_surface("left arrow:red", left_arrow);
-	*/
-
 	for (int i = 0; i < red_arrow_rotations.size(); i++)
 	{
 		string prefix;

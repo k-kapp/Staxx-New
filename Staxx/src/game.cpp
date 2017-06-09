@@ -66,7 +66,6 @@ game::game(tile_colors colors, tile_colors default_on_colors)
 	int end_x = PLAY_COLS*block_size + PLAY_SCREEN_X;
 	int end_y = PLAY_ROWS*block_size + PLAY_SCREEN_Y;
 
-	//next_grid = grid<game_tile>(8, 8, main_grid.off_texture, main_grid.on_texture, NEXT_GRID_X, NEXT_GRID_Y, NEXT_GRID_BLOCK_SIZE, 1, renderer);
 	next_grid = grid<game_tile>(8, 8, textures.at("black:gray"), main_grid.on_texture, 0, 0, NEXT_GRID_BLOCK_SIZE, 1, 0, 0, renderer);
 
 	next_block_rect.x = NEXT_GRID_X;
@@ -81,13 +80,6 @@ game::game(tile_colors colors, tile_colors default_on_colors)
 
 	assign_row_col_nums();
 	set_borders();
-
-	/*
-	next_rect.w = 8 * block_size / 2;
-	next_rect.h = 8 * block_size / 2;
-	next_rect.x = end_x + 4 * block_size;
-	next_rect.y = end_y + block_size - 8 * block_size / 2;
-	*/
 
 	//'next piece' text texture
 	TTF_Font * font = TTF_OpenFont("fonts/ARCADECLASSIC.TTF", 20);
@@ -124,8 +116,6 @@ game::~game()
 	 * remove the timer, in case program exited prematurely
 	 */
 	SDL_RemoveTimer(timer_id);
-	//SDL_DestroyRenderer(renderer);
-	//SDL_DestroyWindow(window);
 }
 
 void game::assign_row_col_nums()
@@ -189,7 +179,6 @@ void game::set_borders()
 		(*tile_iter)->set_on_colors({{0, 150, 150}, {0, 150, 150}});
 		(*tile_iter)->set_off_colors((*tile_iter)->get_on_colors());
 		(*tile_iter)->set_occupied();
-		//(*tile_iter)->set_activation_level(true);
 	}
 
 	for (auto tile_iter = main_grid.tiles[main_grid.num_rows - 1].begin(); tile_iter != main_grid.tiles[main_grid.num_rows - 1].end();
@@ -198,17 +187,14 @@ void game::set_borders()
 		(*tile_iter)->set_on_colors({{0, 150, 150}, {0, 150, 150}});
 		(*tile_iter)->set_off_colors((*tile_iter)->get_on_colors());
 		(*tile_iter)->set_occupied();
-		//(*tile_iter)->set_activation_level(true);
 	}
 
 	for (auto row_iter = main_grid.tiles.begin(); row_iter != main_grid.tiles.end(); advance(row_iter, 1))
 	{
 		row_iter->front()->set_on_colors({{0, 150, 150}, {0, 150, 150}});
 		row_iter->front()->set_occupied();
-		//row_iter->front()->set_activation_level(true);
 		row_iter->back()->set_on_colors(row_iter->front()->get_on_colors());
 		row_iter->back()->set_occupied();
-		//row_iter->back()->set_activation_level(true);
 	}
 }
 
@@ -231,10 +217,7 @@ void game::draw()
 
 void game::update()
 {
-	//cout << "active_block row: " << active_block->get_row() << endl;
-
 	main_grid.update();
-	//next_grid.update();
 }
 
 
@@ -257,9 +240,6 @@ bool game::has_clash()
 
 void game::move_active(move_type move, bool regular)
 {
-	//draw();
-
-	//print_main_occupied();
 
 	void (game::*move_func) ();
 
@@ -297,12 +277,10 @@ void game::move_active(move_type move, bool regular)
 
 		void (game::* remove_func)(vector<int> &);
 		remove_func = nullptr;
-		//function<void(const vector<int> &)> remove_func;
 		vector<int> remove_idxes;
 		if (curr_move == DOWN_MV || curr_move == UP_MV)
 		{
 			remove_idxes = get_full_rows();
-			//remove_func = bind(&game::remove_rows, this);
 			remove_func = &game::remove_rows;
 			if (remove_idxes.size() == 0)
 			{
@@ -313,7 +291,6 @@ void game::move_active(move_type move, bool regular)
 		else if (curr_move == RIGHT_MV || curr_move == LEFT_MV)
 		{
 			remove_idxes = get_full_cols();
-			//remove_func = bind(&game::remove_cols, this);
 			remove_func = &game::remove_cols;
 			if (remove_idxes.size() == 0)
 			{
@@ -341,9 +318,7 @@ void game::move_active(move_type move, bool regular)
 		}
 		if (remove_func) {}
 			(this->*remove_func)(remove_idxes);
-		//remove_rows(remove_idxes);
 		sample_next();
-		//next_grid.draw();
 		if (has_clash())
 		{
 			game_over = true;
@@ -375,7 +350,6 @@ void game::print_next_occupied()
 	{
 		for (auto &tile : row)
 		{
-			//if (tile->is_occupied())
 			if (tile->get_activation_level())
 			{
 				cout << "1";
@@ -397,23 +371,12 @@ shared_ptr<shape> game::generate_next_shape_ptr()
 
 void game::init_sample()
 {
-	/*
-	for (int i = 0; i < 2; i++)
-	{
-		auto next_block = shared_ptr<block>(new block(generate_next_shape_ptr().get(), {100, 0, 0}, {0, 0, 100}));
-		next_blocks.push_back(next_block);
-	}
-	*/
 	sample_next();
 	sample_next();
 }
 
 void game::sample_next()
 {
-	/*
-	set_main_active(next_blocks.front());
-	next_blocks.pop_front();
-	*/
 
 	string next_color_str = block_texture_names.at(static_cast<int>(unif_real(gen) * block_texture_names.size()));
 
@@ -477,48 +440,9 @@ void game::set_main_active(shared_ptr<block> next_active)
 	else
 		reset_timer();
 
-	//shared_ptr<block> next_block = make_shared<block>(*active_block);
 	shared_ptr<block> next_block = make_shared<block>(*next_blocks.back());
-	//set_next_active(next_block);
-
-	/*
-	SDL_SetRenderTarget(renderer, next_texture);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-	SDL_SetRenderTarget(renderer, nullptr);
-	*/
-
-	//next_grid.draw(next_texture);
-
-	//next_grid.draw();
-
-	//print_next_occupied();
 }
 
-/*
-void game::set_next_active(shared_ptr<block> next_active)
-{
-	int col_diff = next_grid.num_cols - next_active->get_width();
-	int row_diff = next_grid.num_rows - next_active->get_height();
-
-	for (int i = next_active->get_row(); i < row_diff / 2; i++)
-		next_active->move_down();
-	for (int j = next_active->get_col(); j < col_diff / 2; j++)
-		next_active->move_right();
-	for (int j = next_active->get_col(); j > col_diff / 2; j--)
-		next_active->move_left();
-
-	for (auto &row : next_grid.tiles)
-	{
-		for (auto &tile : row)
-		{
-			tile->set_active_block(next_active);
-		}
-	}
-
-	next_grid.update();
-}
-*/
 
 void game::set_next_active(shared_ptr<block> next_active)
 {
@@ -526,8 +450,6 @@ void game::set_next_active(shared_ptr<block> next_active)
 	if (next_block_textures.size() > 0)
 		next_block_textures.pop_front();
 	next_block_textures.push_back(next_grid.create_texture(next_active.get(), true));
-	
-	//next_block_texture = next_grid.create_texture(next_active.get(), true);
 }
 
 void game::add_shape(const shared_ptr<shape> &shape_ptr)
@@ -570,8 +492,6 @@ void game::remove_rows(vector<int> &rows_idxes)
 			for (int curr_col = 1; curr_col < main_grid.num_cols - 1; curr_col++)
 			{
 				main_grid.tiles[curr_row][curr_col] = move(main_grid.tiles[curr_row + row_incr][curr_col]);
-				//main_grid.tiles[curr_row - 1][curr_col].reset();
-				//main_grid.tiles[curr_row][curr_col].reset(main_grid.tiles[curr_row - 1][curr_col].release());
 				main_grid.tiles[curr_row][curr_col]->set_row_col(curr_row, curr_col);
 				main_grid.tiles[curr_row][curr_col]->set_coords(main_grid.x_offset + curr_col * main_grid.block_size, 
 					main_grid.y_offset + curr_row * main_grid.block_size);
@@ -624,10 +544,6 @@ void game::remove_cols(vector<int> &cols_idxes)
 				main_grid.block_size, main_grid.block_size, main_grid.off_texture,
 				main_grid.on_texture, renderer);
 
-			/*
-			main_grid.tiles[row_idx][1] = make_shared<game_tile>(first_col_coords[row_idx - 1].first, first_col_coords[row_idx - 1].second,
-				main_grid.block_size, main_grid.block_size, main_grid.off_texture, main_grid.on_texture, renderer);
-			*/
 			main_grid.tiles[row_idx][final_col_idx]->set_row_col(row_idx, final_col_idx);
 		}
 	}
@@ -695,8 +611,6 @@ void game::flash_cols(vector<int> idxes)
 
 vector<int> game::get_full_rows()
 {
-	//int top_row = active_block->get_row();
-	//int bottom_row = active_block->get_row() + active_block->get_height() - 1;
 
 	int bottom_row = main_grid.num_rows - 1;
 	int top_row = 1;
@@ -844,9 +758,6 @@ void game::mainloop()
 				{
 					if (!paused)
 					{
-						//void (*move_down_ptr)(void *) = (void(*)(void *)) event.user.data1;
-						//void * param = event.user.data2;
-						//move_down(param);
 						move_active(curr_move, true);
 					}
 				} break;

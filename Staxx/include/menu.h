@@ -10,33 +10,25 @@ using namespace std;
 
 using coord = pair<int, int>;
 
+/*
+ * The menu type was implemented as its own state, but I should probably create a menu object by itself, which
+ * could be included in a state.
+ */
+
 class menu : public game_state
 {
 public:
 	menu(unsigned width, unsigned height, string heading, unsigned heading_width, unsigned heading_height, 
 			unsigned buttons_width, unsigned buttons_height);
-	//menu(const vector<tuple<string, function<void()>, tile_colors, tile_colors, tile_colors> > &buttons_info);
-	//menu(const vector<tuple<string, tile_colors, tile_colors, tile_colors> > &buttons_info);
-	menu(vector<button> buttons);
 
 	~menu();
 
-	void add_button(const button &new_button);
-	void add_button(const string &text, const function<void()> &callback, 
-					const SDL_Color &on_color, const SDL_Color &off_color);
 	void align_buttons_left(int x_coord);
-	void align_buttons_right(int x_coord);
-	void align_buttons_top();
 	void align_buttons_vertical(int vert_gap);
 	void align_buttons_heading_horiz();
 	void align_buttons_heading_vert(int vert_gap);
 	void center_buttons(int x_coord);
 	void resize_buttons(int width, int height);
-	void space_buttons_vertical(int y_dist);
-	void set_top_button(string button_text);
-	void set_top_button(int idx);
-
-	//void set_buttons(std::vector<button> buttons);
 
 	void set_position(int x, int y);
 	void set_size(int width, int height);
@@ -60,9 +52,6 @@ public:
 
 	void set_buttons_colors(tile_colors off_color, tile_colors on_color, tile_colors clicked_color);
 	void set_buttons_colors(std::string off_color, std::string on_color, std::string clicked_color);
-
-	void set_button_callback(string button_title, function<void()> callback);
-
 	void set_buttons_size(unsigned width, unsigned height);
 
 	void reset_buttons_states();

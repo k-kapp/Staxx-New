@@ -21,9 +21,6 @@
     <ClInclude Include="include\design_grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\fonts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,9 +46,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\clickable_tile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\button_old.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\button.h">

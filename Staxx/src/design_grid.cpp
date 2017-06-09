@@ -107,12 +107,6 @@ struct visit_tile
 	vector<orient> dirs_not_taken;
 };
 
-/*
-
-TODO:
-	- apply a mouse_on_colors coloring to each tile in tiles variable
-
-*/
 
 design_grid::design_grid(int grid_size, tile_colors off_colors, tile_colors hover_colors, tile_colors on_colors,
 	int x_offset, int y_offset, int block_size, int border_size)
@@ -155,14 +149,6 @@ design_grid::design_grid(int grid_size, SDL_Texture * off_texture, SDL_Texture *
 	set_tile_colors();
 	make_buttons();
 }
-
-/*
-design_grid::~design_grid()
-{
-	SDL_DestroyWindow(window);
-	SDL_DestroyRenderer(renderer);
-}
-*/
 
 void design_grid::make_buttons()
 {
@@ -214,12 +200,6 @@ void design_grid::set_tile_colors()
 			tl->set_off_texture(off_texture);
 			tl->set_hover_texture(hover_texture);
 			tl->set_on_texture(on_texture);
-			
-			/*
-			tl->set_off_colors(button_off_colors);
-			tl->set_hover_colors(button_hover_colors);
-			tl->set_on_colors(button_on_colors);
-			*/
 		}
 	}
 }

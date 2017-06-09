@@ -14,6 +14,13 @@ class shape;
 
 class block;
 
+/*
+ * The grid type is useful wherever a grid of tiles, each with the same type, is to be used. For this reason, the grid type is
+ * templatised. It also contains a few basic utility functions, such as drawing the grid, applying a function to all grid tiles,
+ * etc. This class could probably be further improved, still, since it contains certain functions that might not be useful for all
+ * grids (such as the set_to_block function, for example).
+ */
+
 template<typename T>
 class grid
 {
@@ -53,25 +60,11 @@ public:
 		border_size = other.border_size;
 		renderer = other.renderer;
 
-		//below will be appropriate if textures for program are explicitly owned by objects
-		/*
-		// NB: check if I can do this below. Do I need to set the property of 
-		// rendertarget textures such that they are capable of being rendertargets?
-
-		// copy textures to new object
-		SDL_SetRenderTarget(renderer, on_texture);
-		SDL_RenderCopy(renderer, other.on_texture, NULL, NULL);
-		SDL_SetRenderTarget(renderer, off_texture);
-		SDL_RenderCopy(renderer, other.off_texture, NULL, NULL);
-		SDL_SetRenderTarget(renderer, NULL);
-		*/
 
 		// below will be appropriate if all textures for the program reside in some memory
 		// accessible to the whole program
 		on_texture = other.on_texture;
 		off_texture = other.off_texture;
-
-		//fill_grid();
 		copy_grid(other);
 	}
 
@@ -182,7 +175,6 @@ public:
 				row_iter->push_back(make_shared<T>(x_offset + padding_horiz*(1 + 2*j) + j * block_size, 
 					y_offset + padding_vert*(1 + 2*i) + i * block_size, block_size, block_size, off_texture, on_texture,
 					renderer));
-				//row_iter->push_back(make_unique<T>(this, i, j));
 			}
 		}
 	}
@@ -313,11 +305,7 @@ public:
 	vector<int> get_full_rows();
 	void remove_rows(const vector<int> rows);
 
-	//virtual void set_active(shared_ptr<block> new_active);
-	//bool draw_no_render();
-
 protected:
-	//shared_ptr<block> active_block;
 
 	void center_shape(block * block_ptr)
 	{

@@ -22,12 +22,10 @@
     <ClInclude Include="include\basic_tile.h" />
     <ClInclude Include="include\block.h" />
     <ClInclude Include="include\button.h" />
-    <ClInclude Include="include\button_old.h" />
     <ClInclude Include="include\common_surfaces.h" />
     <ClInclude Include="include\constants.h" />
     <ClInclude Include="include\design_grid.h" />
     <ClInclude Include="include\design_selection.h" />
-    <ClInclude Include="include\fonts.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\game_state.h" />
     <ClInclude Include="Include\game_tile.h" />

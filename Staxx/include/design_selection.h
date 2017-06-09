@@ -6,6 +6,11 @@
 #include "button.h"
 #include <vector>
 
+/*
+ * Game state for the design selection. Each shape is a clickble_tile object with a texture showing each
+ * shape. Selected shapes are then used in the next game.
+ */
+
 class design_selection : game_state
 {
 public:

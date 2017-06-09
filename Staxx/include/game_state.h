@@ -8,6 +8,11 @@
 #include <string>
 #include <map>
 
+/*
+ * Base class for each game state. A new window gets created for each game state, with its own renderer.
+ * I might change it in the future so that we use the same window and renderer for each state.
+ */
+
 class game_state
 {
 public:

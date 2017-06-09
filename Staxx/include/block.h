@@ -6,6 +6,11 @@
 
 class shape;
 
+/*
+ * A block is a stateful representation of a shape. So, a block is a shape that has a specific position, 
+ * an orientation, etc.
+ */
+
 class block
 {
 public:

@@ -25,8 +25,6 @@ using namespace std;
 void new_game(menu * parent)
 {
 
-	//auto shapes = import_shapes();
-
 	if (usable_shapes.size() == 0)
 		return;
 
@@ -88,12 +86,6 @@ int main(int argc, char * argv [])
 	bool exit_menu = false;
 
 	menu main_menu(400, 600, "STAXX", 250, 100, 160, 80);
-
-	/*
-	tile_colors button_off = { {100, 0, 0}, {255, 255, 255} };
-	tile_colors button_hover = { {225, 0, 0}, {255, 255, 255} };
-	tile_colors button_on = { {255, 0, 0}, {255, 255, 255} };
-	*/
 
 	string button_off = "dark red";
 	string button_hover = "red";

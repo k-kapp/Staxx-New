@@ -11,6 +11,11 @@
 
 class game;
 
+/*
+ * The play board consists of the game_tile type, defined below. It differs from the clickable tile in that
+ * it does not respond to mouse clicks and it has a few extra utility functions for determining e.g. clashes, etc.
+ */
+
 class game_tile : public basic_tile
 {
 public:

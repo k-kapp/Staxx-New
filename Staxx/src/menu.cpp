@@ -17,74 +17,16 @@ menu::menu(unsigned width, unsigned height, string heading, unsigned heading_wid
 	: width(width), height(height), heading_str(heading), game_state("Main menu", 100, 100, width, height),
 		buttons_width(buttons_width), buttons_height(buttons_height)
 {
-	//window = SDL_CreateWindow("Main menu", 100, 100, width, height, 0);
-	//renderer = SDL_CreateRenderer(window, -1, 0);
-
 	heading_rect = { ((int)width - (int)heading_width) / 2, (int)heading_top_spacing, (int)heading_width, (int)heading_height };
-
 	setup_heading();
 }
 
-/*
-menu::menu(const vector<tuple<string, function<void()>, tile_colors, tile_colors, tile_colors> > &buttons_info)
-{
-	window = SDL_CreateWindow("Main menu", 100, 100, 400, 600, 0);
-	renderer = SDL_CreateRenderer(window, -1, 0);
-
-	for (auto &b_info : buttons_info)
-	{
-		//buttons.emplace_back(0, 0, 0, 0, get<2>(b_info), get<3>(b_info), get<1>(b_info), get<0>(b_info), renderer);
-
-		int x_coord = 0;
-		int y_coord = 0;
-		unsigned width = 0;
-		unsigned height = 0;
-
-		tile_colors off_col = get<2>(b_info);
-		tile_colors on_col = get<3>(b_info);
-		tile_colors active_col = get<4>(b_info);
-
-		string button_text = get<0>(b_info);
-
-		buttons.emplace_back(x_coord, y_coord, width, height, off_col, on_col, active_col, get<1>(b_info), button_text, renderer);
-	}
-}
-
-menu::menu(const vector<tuple<string, tile_colors, tile_colors, tile_colors> > &buttons_info)
-{
-	window = SDL_CreateWindow("Main menu", 100, 100, 400, 600, 0);
-	renderer = SDL_CreateRenderer(window, -1, 0);
-
-	for (auto &b_info : buttons_info)
-	{
-		int x_coord = 0;
-		int y_coord = 0;
-		unsigned width = 0;
-		unsigned height = 0;
-
-		tile_colors off_col = get<1>(b_info);
-		tile_colors on_col = get<2>(b_info);
-		tile_colors active_col = get<3>(b_info);
-
-		string button_text = get<0>(b_info);
-
-		buttons.emplace_back(x_coord, y_coord, width, height, off_col, on_col, active_col, button_text, renderer);
-	}
-}
-*/
 
 menu::~menu()
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 }
-
-/*
-void menu::set_buttons(vector<button> buttons)
-{
-	this->buttons = move(buttons);
-}
-*/
 
 void menu::set_buttons_size(unsigned width, unsigned height)
 {
@@ -111,16 +53,8 @@ void menu::add_button(string text, function<void()> callback)
 
 	coords.second += size.second + button_vert_spacing;
 
-	//button new_button(coords.first, coords.second, buttons_width, buttons_height, button_off_col, button_hover_col, button_on_col,
-	//	callback, text, renderer);
-
 	buttons.emplace_back(coords.first, coords.second, buttons_width, buttons_height, button_off_col, button_hover_col, button_on_col,
 		callback, text, renderer);
-
-	//buttons.push_back(move(new_button));
-
-	//buttons.emplace_back(coords.first, coords.second, buttons_width, buttons_height, button_off_col, button_on_col, button_clicked_col,
-	//	callback, text, renderer);
 }
 
 void menu::set_buttons_colors(tile_colors off_color, tile_colors hover_color, tile_colors on_color)
@@ -251,19 +185,6 @@ void menu::resize_buttons(int width, int height)
 	}
 }
 
-/*
-void menu::set_button_callback(string button_title, function<void()> callback)
-{
-	for (auto &bt : buttons)
-	{
-		if (bt.get_text() == button_title)
-		{
-			bt.set_callback(callback);
-		}
-	}
-}
-*/
-
 void menu::show_menu()
 {
 	reset_buttons_states();
@@ -279,8 +200,6 @@ void menu::draw_buttons()
 {
 	for (auto &bt : buttons)
 	{
-		//auto button_color = bt.get_off_colors();
-		//cout << "button colour: " << button_color.base.red << " " << button_color.base.green << " " << button_color.base.blue << endl;
 		bt.draw();
 	}
 }

@@ -46,5 +46,3 @@ const Uint32 SDL_TEXTURE_FORMAT = SDL_PIXELFORMAT_RGB24;
 
 const char * FONT_FILEPATH = "fonts/ARCADECLASSIC.TTF";
 
-//const SDL_Texture * GAME_OFF_TEXTURE = make_default_off_texture();
-//const SDL_Texture * GAME_ON_TEXTURE = make_default_on_texture();

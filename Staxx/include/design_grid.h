@@ -13,15 +13,11 @@
 extern const int BLOCK_SIZE;
 
 /*
-void a_func(int a1, int a2)
-{
-	cout << "Function called" << endl;
-	cout << "args: " << a1 << ", " << a2 << endl;
-}
-
-void func2()
-{}
-*/
+ * The game state for the design grid. The design grid is composed of clickable tiles, each of which
+ * toggles when clicked. The shape of the toggled tiles then determines our shape. Note that I employed
+ * a depth-first search algorithm to determine whether the shape is connected, so that we do not have
+ * a "shape" that actually consists of two or more shapes.
+ */
 
 using bool_2d = deque< deque<bool> >;
 
@@ -33,7 +29,6 @@ public:
 				int border_size);
 	design_grid(int grid_size, SDL_Texture * off_texture, SDL_Texture * hover_texture,
 		SDL_Texture * on_texture, int x_offset, int y_offset, int block_size, int border_size);
-	//~design_grid();
 
 	void mainloop();
 	void get_mouse_in_grid();
@@ -48,10 +43,6 @@ public:
 	void set_new_on_color(SDL_Texture * new_color);
 	void set_new_on_color(tile_colors colors);
 	void set_new_on_color(std::string color);
-
-	//void make_save_button();
-	//void draw_save_button();
-	//bool mouse_on_save_button();
 
 protected:
 	void draw() override;
@@ -69,13 +60,7 @@ private:
 	bool quit;
 	int active_count;
 
-	//static constexpr auto bound_func = bind(a_func, init1, init2);
-
 	SDL_Rect save_rect_inner, save_rect_outer;
-	//button<decltype(function<void()>(bind(a_func, 1, 1)))> save_button;
-	//button<decltype(function<void()>(bind(a_func, 1, 1)))> discard_button;
-	//button<void(*)()> save_button;
-	//button<void(*)()> discard_button;
 	std::unique_ptr<button> save_button;
 	std::unique_ptr<button> quit_button;
 

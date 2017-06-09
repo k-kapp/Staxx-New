@@ -23,6 +23,13 @@ using next_type = list<shared_ptr<block> >;
 
 class clickable_tile;
 
+/*
+ * Game state for the actual gameplay. The play area is composed of game_tiles, each of which activates
+ * when a shape is fixed there. In each frame, we detect whether a shape is moving over each tile, and
+ * if so, then we change the tile to the appropriate colour. Therefore, tiles are not officially "active"
+ * when a shape moves over it.
+*/
+
 class game : game_state
 {
 public:
@@ -51,8 +58,7 @@ public:
 	void set_main_active(shared_ptr<block>);
 	void set_next_active(shared_ptr<block>);
 	void reset_timer();
-
-	void init_timer(Uint32 (*)(Uint32, void *));
+	void init_timer(Uint32(*func_ptr)(Uint32, void *));
 
 	void assign_row_col_nums();
 
@@ -81,7 +87,6 @@ private:
 				if ((*set_block)(block_row, block_col))
 				{
 					grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_occupied();
-					//grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_on_colors(set_block->colors);
 					grid(set_block->get_row() + block_row, set_block->get_col() + block_col)->set_on_texture(set_block->get_texture());
 				}
 			}

@@ -20,37 +20,6 @@ clickable_tile::clickable_tile(int x_coord, int y_coord, unsigned width, unsigne
 	this->hover_texture = hover_texture;
 }
 
-/*
-clickable_tile::clickable_tile(int x_coord, int y_coord, unsigned width, unsigned height, tile_colors off_colors, tile_colors on_colors, SDL_Renderer * renderer) 
-			: basic_tile(x_coord, y_coord, width, height, off_colors, on_colors, renderer)
-{
-
-	auto coords_pair = get_coords();
-
-	outer.x = coords_pair.first;
-	outer.y = coords_pair.second;
-	outer.h = height;
-	outer.w = width;
-
-	inner.x = outer.x + 1;
-	inner.y = outer.y + 1;
-	inner.w = outer.w - 2;
-	inner.h = outer.h - 2;
-}
-*/
-/*
-clickable_tile::clickable_tile(int x_coord, int y_coord, unsigned width, unsigned height, tile_colors off_colors, tile_colors hover_colors, tile_colors on_colors, SDL_Renderer * renderer) 
-			: clickable_tile(x_coord, y_coord, width, height, off_colors, on_colors, renderer)
-{
-	this->hover_colors = hover_colors;
-}
-
-clickable_tile::clickable_tile(const clickable_tile &other) 
-	: clickable_tile(other.x_coord, other.y_coord, other.width, other.height, other.off_colors, other.hover_colors, other.on_colors, other.renderer)
-{
-}
-*/
-
 clickable_tile::clickable_tile(const clickable_tile &other)
 	: clickable_tile(other.x_coord, other.y_coord, other.width, other.height, other.off_texture, other.hover_texture, other.on_texture, other.renderer)
 {
@@ -89,26 +58,6 @@ bool clickable_tile::mouse_on_button()
 
 void clickable_tile::draw(SDL_Texture * target)
 {
-	/*
-	color * col;
-
-	color base_col, border_col;
-
-	if (mouse_on_button())
-	{
-		SDL_SetRenderTarget(renderer, target);
-
-		base_col = hover_colors.base;
-		border_col = hover_colors.border;
-
-		SDL_SetRenderDrawColor(renderer, border_col.red, border_col.green, border_col.blue, 255);
-		SDL_RenderFillRect(renderer, &outer);
-		SDL_SetRenderDrawColor(renderer, base_col.red, base_col.green, base_col.blue, 255);
-		SDL_RenderFillRect(renderer, &inner);
-
-		SDL_SetRenderTarget(renderer, nullptr);
-	}
-	*/
 
 	if (get_activation_level() == 1)
 	{
