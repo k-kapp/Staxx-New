@@ -9,6 +9,13 @@ Note that I did not use a UI API for the buttons, etc. I only used SDL2. Therefo
 
 Should be compilable with Visual Studio 2015. SDL2 should also be referenced in the project, as well as the boost libraries.
 
+Gameplay-wise, the game is pretty difficult with the shapes I have included in this repository. But, users can easily design their own shapes, customizing their gameplay experience.
+
+TODO:
+
++ Add functionality for deleting shapes from within the program
++ Remember which shapes were selected in a previous run of the program (currently, all shapes are initially selected. The user must select the desired shapes again, after running the program again).
+
 Some screenshots follow. The first is of gameplay, the second of the design grid, and the third screenshot is the main menu:
 
 <p align="center">
