@@ -10,8 +10,6 @@
 using namespace std;
 
 class shape;
-
-
 class block;
 
 /*
@@ -45,6 +43,26 @@ public:
 				border_size(border_size), renderer(renderer), off_texture(off_texture), on_texture(on_texture), 
 				padding_horiz(padding_horiz), padding_vert(padding_vert)
 	{
+		/*
+			see comment at grid object destructor below
+		*/
+		if (on_texture)
+		{
+			this->on_texture = copy_SDL_texture(on_texture, renderer);
+		}
+		else
+		{
+			this->on_texture = NULL;
+		}
+
+		if (off_texture)
+		{
+			this->off_texture = copy_SDL_texture(off_texture, renderer);
+		}
+		else
+		{
+			this->off_texture = NULL;
+		}
 		fill_grid();
 	}
 
@@ -60,12 +78,28 @@ public:
 		border_size = other.border_size;
 		renderer = other.renderer;
 
-
-		// below will be appropriate if all textures for the program reside in some memory
-		// accessible to the whole program
-		on_texture = other.on_texture;
-		off_texture = other.off_texture;
+		SDL_Texture * prev_rendertarget = SDL_GetRenderTarget(renderer);
+		SDL_SetRenderTarget(renderer, on_texture);
+		SDL_RenderCopy(renderer, other.on_texture, NULL, NULL);
+		SDL_SetRenderTarget(renderer, off_texture);
+		SDL_RenderCopy(renderer, other.off_texture, NULL, NULL);
+		SDL_SetRenderTarget(renderer, prev_rendertarget);
 		copy_grid(other);
+	}
+
+	~grid()
+	{
+		/*
+			this destruction of textures is slightly debatable. Another option would be
+			to have all necessary textures in one central location, then simply do DestroyRenderer
+			when the renderer is not necessary anymore. That is, the grid object does not "own" the textures
+			and is thus not responsible for destroying them. On the other hand, this might possibly introduce
+			memory leaks if the program quits unexpectedly.
+		*/
+		if (on_texture)
+			SDL_DestroyTexture(on_texture);
+		if (off_texture)
+			SDL_DestroyTexture(off_texture);
 	}
 
 	grid &operator = (const grid &other)
@@ -299,11 +333,6 @@ public:
 			}
 		}
 	}
-
-	bool draw_render();
-	void flash_rows(vector<int>);
-	vector<int> get_full_rows();
-	void remove_rows(const vector<int> rows);
 
 protected:
 

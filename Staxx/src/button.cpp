@@ -19,6 +19,9 @@ using namespace std;
 SDL_Texture * make_button_texture(unsigned width, unsigned height, std::string text, SDL_Texture * background_texture,
 									SDL_Renderer * renderer)
 {
+	if (!background_texture)
+		return NULL;
+
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 

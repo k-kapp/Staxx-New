@@ -287,3 +287,24 @@ vector<SDL_Surface *> get_all_rotations(SDL_Surface * surface)
 
 	return surfaces;
 }
+
+SDL_Texture * copy_SDL_texture(SDL_Texture * src_texture, SDL_Renderer * renderer)
+{
+	if (!src_texture)
+		return NULL;
+
+	Uint32 src_format;
+	int src_access;
+	int src_w;
+	int src_h;
+	SDL_QueryTexture(src_texture, &src_format, &src_access, &src_w, &src_h);
+
+	SDL_Texture * new_texture = SDL_CreateTexture(renderer, src_format, SDL_TEXTUREACCESS_TARGET, src_w, src_h);
+	
+	SDL_Texture * prev_rendertarget = SDL_GetRenderTarget(renderer);
+	SDL_SetRenderTarget(renderer, new_texture);
+	SDL_RenderCopy(renderer, src_texture, NULL, NULL);
+	SDL_SetRenderTarget(renderer, prev_rendertarget);
+
+	return new_texture;
+}

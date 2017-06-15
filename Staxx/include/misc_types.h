@@ -74,4 +74,6 @@ SDL_Surface * mult_copy_surface(SDL_Surface * surface, color col);
 
 std::vector<SDL_Surface *> get_all_rotations(SDL_Surface * surface);
 
+SDL_Texture * copy_SDL_texture(SDL_Texture * texture, SDL_Renderer * renderer);
+
 #endif

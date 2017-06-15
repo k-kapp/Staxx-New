@@ -52,11 +52,9 @@ protected:
 
 	SDL_Texture * off_texture, *on_texture;
 
-	void set_inner_outer();
+	void set_outer_rect();
 
-	SDL_Texture * make_color_texture(tile_colors colors);
-
-	SDL_Rect inner, outer;
+	SDL_Rect outer;
 
 
 	unsigned activation_level = 0;

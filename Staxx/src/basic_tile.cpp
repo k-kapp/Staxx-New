@@ -8,7 +8,7 @@ basic_tile::basic_tile(int x_coord, int y_coord, unsigned width, unsigned height
 						SDL_Renderer * renderer)
 	: x_coord(x_coord), y_coord(y_coord), width(width), height(height), off_texture(off_texture), on_texture(on_texture), renderer(renderer)
 {
-	set_inner_outer();
+	set_outer_rect();
 }
 
 basic_tile::basic_tile(const basic_tile &other) 
@@ -20,7 +20,6 @@ basic_tile& basic_tile::operator=(const basic_tile &other)
 {
 	x_coord = other.x_coord;
 	y_coord = other.y_coord;
-	inner = other.inner;
 	outer = other.outer;
 	width = other.width;
 	height = other.height;
@@ -30,7 +29,7 @@ basic_tile& basic_tile::operator=(const basic_tile &other)
 }
 
 
-void basic_tile::set_inner_outer()
+void basic_tile::set_outer_rect()
 {
 	auto coords_pair = get_coords();
 
@@ -38,12 +37,6 @@ void basic_tile::set_inner_outer()
 	outer.y = coords_pair.second;
 	outer.h = height;
 	outer.w = width;
-
-	inner.x = outer.x + 1;
-	inner.y = outer.y + 1;
-	inner.w = outer.w - 2;
-	inner.h = outer.h - 2;
-
 }
 
 pair<int, int> basic_tile::get_coords() const
@@ -56,7 +49,7 @@ void basic_tile::set_coords(int x_coord, int y_coord)
 	this->x_coord = x_coord;
 	this->y_coord = y_coord;
 
-	set_inner_outer();
+	set_outer_rect();
 }
 
 void basic_tile::set_size(unsigned width, unsigned height)
@@ -64,7 +57,7 @@ void basic_tile::set_size(unsigned width, unsigned height)
 	this->height = height;
 	this->width = width;
 
-	set_inner_outer();
+	set_outer_rect();
 }
 
 std::pair<unsigned, unsigned> basic_tile::get_size()
@@ -102,6 +95,12 @@ tile_colors basic_tile::get_off_colors()
 	return off_colors;
 }
 
+/*
+	This 'target' parameter is for when the tile must be drawn to a rendertarget
+	other than the default. This rendertarget gets specified by the caller of the
+	object, and the caller is also responsible for restoring the original target
+	after rendering.
+*/
 void basic_tile::draw(SDL_Texture * target)
 {
 	if (activation_level)
@@ -111,6 +110,11 @@ void basic_tile::draw(SDL_Texture * target)
 }
 
 
+/*
+	derived classes will implement this function, since basic_tile fundamentally does not
+	serve a specific purpose. This makes derived classes more flexible, since they don't need
+	to deal with behaviours in the base class regarding the 'update' function.
+*/
 void basic_tile::update()
 {
 	
