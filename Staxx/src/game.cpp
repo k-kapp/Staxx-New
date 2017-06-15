@@ -66,9 +66,6 @@ game::game(tile_colors colors, tile_colors default_on_colors)
 	int end_x = PLAY_COLS*block_size + PLAY_SCREEN_X;
 	int end_y = PLAY_ROWS*block_size + PLAY_SCREEN_Y;
 
-	SDL_Texture * next_grid_on_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, PLAY_BLOCK_SIZE, PLAY_BLOCK_SIZE);
-	SDL_Texture * next_grid_off_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, PLAY_BLOCK_SIZE, PLAY_BLOCK_SIZE);
-
 	next_grid = grid<game_tile>(8, 8, textures.at("black:gray"), NULL, 0, 0, NEXT_GRID_BLOCK_SIZE, 1, 0, 0, renderer);
 
 	next_block_rect.x = NEXT_GRID_X;
