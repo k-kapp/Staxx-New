@@ -4,7 +4,7 @@
 #define CONSTANTS_H
 
 #include <string>
-#include "SDL2/SDL.h";
+#include "SDL2/SDL.h"
 
 extern const int INIT_DELAY;
 
@@ -15,6 +15,11 @@ extern const int DESIGN_BLOCK_SIZE;
 
 extern const int PLAY_BORDER_SIZE;
 extern const int DESIGN_BORDER_SIZE;
+
+extern const int DESIGN_SELECT_BLOCK_SIZE;
+extern const int DESIGN_SELECT_SCROLLER_SIZE;
+extern const int DESIGN_SELECT_SCREEN_WIDTH;
+extern const int DESIGN_SELECT_SCREEN_HEIGHT;
 
 extern const std::string PLAY_SCREEN_TITLE;
 extern const int PLAY_SCREEN_X;

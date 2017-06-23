@@ -9,6 +9,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 
 using namespace std;
@@ -288,6 +289,44 @@ vector<SDL_Surface *> get_all_rotations(SDL_Surface * surface)
 	return surfaces;
 }
 
+vector<string> split_text(string text, bool ignore_empty)
+{
+	string curr_word;
+	vector<string> words;
+	for (char ch : text)
+	{
+		if (isspace(ch))
+		{
+			if (!(ignore_empty && (curr_word.size() == 0)))
+				words.push_back(curr_word);
+			curr_word.clear();
+		}
+		else
+		{
+			curr_word += ch;
+		}
+	}
+	words.push_back(curr_word);
+	return words;
+}
+
+string rebuild_string(vector<string> splitted, bool ignore_empty)
+{
+	string rebuilt = "";
+	if (splitted.size() == 0)
+		return rebuilt;
+	for (int i = 0; i < splitted.size() - 1; i++)
+	{
+		if (ignore_empty && (splitted.at(i).size() == 0))
+			continue;
+		rebuilt += splitted.at(i) + " ";
+	}
+
+	rebuilt += splitted.back();
+
+	return rebuilt;
+}
+
 SDL_Texture * copy_SDL_texture(SDL_Texture * src_texture, SDL_Renderer * renderer)
 {
 	if (!src_texture)
@@ -307,4 +346,145 @@ SDL_Texture * copy_SDL_texture(SDL_Texture * src_texture, SDL_Renderer * rendere
 	SDL_SetRenderTarget(renderer, prev_rendertarget);
 
 	return new_texture;
+}
+
+SDL_Rect get_text_rect(string text, TTF_Font * font, int x, int y, int font_size)
+{
+	SDL_Rect rect;
+	rect.x = x;
+	rect.y = y;
+	double ratio;
+
+	TTF_SizeText(font, text.c_str(), &rect.w, &rect.h);
+	if (font_size >= 0)
+		ratio = ((double)font_size) / rect.h;
+	else
+		ratio = 1.0;
+	rect.h = font_size;
+	rect.w *= ratio;
+
+	return rect;
+}
+
+vector<pair<SDL_Rect, SDL_Texture *> > get_wrapped_text_rects_textures(string text, TTF_Font * font, 
+																SDL_Renderer * renderer, int x, int y, int max_width, int font_size, int space_size)
+{
+	vector<string> splitted = split_text(text, true);
+	vector<pair<SDL_Rect, SDL_Texture *> > rect_textures;
+
+	if (splitted.size() == 0)
+		return{};
+
+	int mid_x = x + max_width / 2;
+
+	string cand_line = splitted.front();
+	string curr_line = cand_line;
+	string prev_added = "";
+	string next_word = "";
+
+	int curr_y;
+	int w, h;
+
+	TTF_SizeText(font, "H", &w, &h);
+	double ratio = font_size / ((double)h);
+
+	TTF_SizeText(font, curr_line.c_str(), &w, &h);
+	curr_y = y;
+
+	vector<string>::iterator iter;
+
+	auto add_new_pair = [&]() {
+		pair<SDL_Rect, SDL_Texture *> new_pair;
+		SDL_Rect &new_rect = new_pair.first;
+		SDL_Texture * &new_texture = new_pair.second;
+
+		/*
+		TTF_SizeText(font, curr_line.c_str(), &new_rect.w, &new_rect.h);
+		new_rect.x = mid_x - new_rect.w / 2;
+		*/
+
+		new_rect.y = curr_y;
+		new_rect.x = 0;
+
+		new_rect = get_text_rect(curr_line, font, new_rect.x, new_rect.y, font_size);
+		new_rect.x = mid_x - new_rect.w / 2;
+
+		SDL_Surface * text_surface = TTF_RenderText_Solid(font, curr_line.c_str(), { 255, 255, 255 });
+		new_texture = SDL_CreateTextureFromSurface(renderer, text_surface);
+		rect_textures.push_back(new_pair);
+
+		SDL_FreeSurface(text_surface);
+		
+		curr_y += font_size + space_size;
+
+	};
+
+	int word_count = 1;
+	for (int i = 1; i < splitted.size(); i++)
+	{
+		iter = next(splitted.begin(), i);
+		if (w > max_width)
+		{
+			add_new_pair();
+
+			/*
+			 * if we have only one word, add the candidate line to the finished
+			 * lines and make the current and candidate lines equal to the next
+			 * word
+			 */
+			if (word_count == 1)
+			{
+				curr_line = *iter;
+				cand_line = *iter;
+			}
+			/*
+			 * if more than one word, add the current line without the latest word,
+			 * then make both current and candidate lines equal to the lastest word,
+			 * which caused the line to be too large. Also decrement i, so that we may see
+			 * the next word in the iteration again, since we ignore it in this case
+			 */
+			else
+			{
+				curr_line = prev_added;
+				cand_line = prev_added;
+				i--;
+			}
+			prev_added = "";
+			word_count = 1;
+
+			TTF_SizeText(font, cand_line.c_str(), &w, NULL);
+			w *= ratio;
+		}
+		else
+		{
+			/*
+			 * update lines, candidate and current
+			 */
+			if (prev_added.size() > 0)
+				curr_line += " " + prev_added;
+			cand_line += " " + *iter;
+			prev_added = *iter;
+			word_count++;
+
+			/*
+			 * update widths and x positions
+			 */
+			TTF_SizeText(font, cand_line.c_str(), &w, NULL);
+			w *= ratio;
+		}
+	}
+	if (w > max_width)
+	{
+		add_new_pair();
+		curr_line = prev_added;
+		if (prev_added.size() > 0)
+			add_new_pair();
+	}
+	else
+	{
+		curr_line = cand_line;
+		add_new_pair();
+	}
+
+	return rect_textures;
 }

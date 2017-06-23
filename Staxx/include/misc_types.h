@@ -5,7 +5,9 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <utility>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 struct color
 {
@@ -75,5 +77,12 @@ SDL_Surface * mult_copy_surface(SDL_Surface * surface, color col);
 std::vector<SDL_Surface *> get_all_rotations(SDL_Surface * surface);
 
 SDL_Texture * copy_SDL_texture(SDL_Texture * texture, SDL_Renderer * renderer);
+
+std::string remove_consec_spaces(std::string text);
+
+SDL_Rect get_text_rect(std::string text, TTF_Font * font, int x, int y, int font_size = -1);
+
+std::vector<std::pair<SDL_Rect, SDL_Texture *> > get_wrapped_text_rects_textures(std::string text, TTF_Font * font,
+	SDL_Renderer * renderer, int x, int y, int max_width, int font_size, int space_size);
 
 #endif

@@ -26,6 +26,7 @@ private:
 
 	void cancel();
 	void save_selection();
+	void delete_first_click();
 
 private:
 	
@@ -37,6 +38,11 @@ private:
 
 	SDL_Event * pass_event;
 
-	button save_button, cancel_button;
+	button save_button, cancel_button, delete_button;
 
+	std::vector<SDL_Texture *> confirm_text_textures;
+
+	std::vector<std::pair<SDL_Rect, SDL_Texture *> > confirm_text_rects_textures;
+
+	bool draw_confirm_delete_text = false;
 };

@@ -22,20 +22,26 @@ class scroll_grid
 public:
 	scroll_grid(unsigned view_cols, unsigned view_rows, int x_offset, int y_offset,
 		unsigned padding_horiz, unsigned padding_vert, unsigned block_size, SDL_Texture * empty_texture, SDL_Renderer * renderer,
-		std::map<std::string, SDL_Texture *> textures)
+		unsigned scroll_buttons_size, std::map<std::string, SDL_Texture *> textures)
 		: view_cols(view_cols), view_rows(view_rows), x_offset(x_offset), y_offset(y_offset),
+
 		padding_horiz(padding_horiz), padding_vert(padding_vert), block_size(block_size), renderer(renderer),
+
 		view_grid(view_rows, view_cols, nullptr, nullptr, x_offset, y_offset, block_size, 1, padding_horiz,
 			padding_vert, renderer), empty_texture(empty_texture),
-		up_button(view_grid.get_x() + view_grid.get_width(), view_grid.get_y(), block_size/3, block_size/3, 
+
+		up_button(view_grid.get_x() + view_grid.get_width(), view_grid.get_y(), scroll_buttons_size, scroll_buttons_size, 
 			textures.at("up arrow:dark red"), textures.at("up arrow:red"), textures.at("up arrow:red"), 
 			bind(&scroll_grid::scroll_up, this), renderer),
-		down_button(view_grid.get_x() + view_grid.get_width(), view_grid.get_y() + view_grid.get_height() - block_size/3, block_size/3, block_size/3,
-		textures.at("down arrow:dark red"), textures.at("down arrow:red"), textures.at("down arrow:red"),
-			bind(&scroll_grid::scroll_down, this), renderer), num_screens(0)
+
+		down_button(view_grid.get_x() + view_grid.get_width(), view_grid.get_y() + view_grid.get_height() - block_size/3, 
+			scroll_buttons_size, scroll_buttons_size, textures.at("down arrow:dark red"), textures.at("down arrow:red"), 
+			textures.at("down arrow:red"), bind(&scroll_grid::scroll_down, this), renderer), num_screens(0),
+
+		scroll_buttons_width(scroll_buttons_size)
 	{
-		higher_x = x_offset + view_grid.num_cols * (view_grid.block_size + 2 * padding_horiz);
-		higher_y = y_offset + view_grid.num_rows * (view_grid.block_size + 2 * padding_vert);
+		higher_x = get_x() + get_width();
+		higher_y = get_y() + get_height();
 	}
 
 	void add_tiles(const vector<shared_ptr<T> > &new_tiles)
@@ -82,22 +88,22 @@ public:
 			down_button.update();
 	}
 
-	int view_grid_higher_x()
+	int get_view_grid_higher_x()
 	{
 		return view_grid.get_width() + view_grid.get_x();
 	}
 
-	int view_grid_higher_y()
+	int get_view_grid_higher_y()
 	{
 		return view_grid.get_height() + view_grid.get_y();
 	}
 
-	unsigned view_grid_width()
+	unsigned get_view_grid_width()
 	{
 		return view_grid.get_width();
 	}
 
-	unsigned view_grid_height()
+	unsigned get_view_grid_height()
 	{
 		return view_grid.get_height();
 	}
@@ -136,6 +142,35 @@ public:
 		return ((int)scroll_pos >= num_screens - 1);
 	}
 
+	unsigned get_width()
+	{
+		return get_view_grid_width() + scroll_buttons_width;
+	}
+
+	unsigned get_height()
+	{
+		return get_view_grid_height() + scroll_buttons_height;
+	}
+
+	int get_x()
+	{
+		return x_offset;
+	}
+
+	int get_y()
+	{
+		return y_offset;
+	}
+
+	int get_higher_x()
+	{
+		return higher_x;
+	}
+
+	int get_higher_y()
+	{
+		return higher_y;
+	}
 
 private:
 	grid<T> view_grid;
@@ -153,4 +188,7 @@ private:
 	int higher_x, higher_y;
 
 	unsigned num_screens;
+
+	unsigned scroll_buttons_width;
+	unsigned scroll_buttons_height;
 };
