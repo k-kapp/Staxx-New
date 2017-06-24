@@ -30,7 +30,7 @@ public:
 	design_grid(int grid_size, SDL_Texture * off_texture, SDL_Texture * hover_texture,
 		SDL_Texture * on_texture, int x_offset, int y_offset, int block_size, int border_size);
 
-	void mainloop();
+	int mainloop();
 	void get_mouse_in_grid();
 	void set_tile_colors();
 	void make_buttons();

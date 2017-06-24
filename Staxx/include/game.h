@@ -54,7 +54,7 @@ public:
 	vector<int> get_full_cols();
 	shared_ptr<shape> generate_next_shape_ptr();
 	void set_borders();
-	void mainloop();
+	int mainloop();
 	void set_main_active(shared_ptr<block>);
 	void set_next_active(shared_ptr<block>);
 	void reset_timer();

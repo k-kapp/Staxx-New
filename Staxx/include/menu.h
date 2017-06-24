@@ -46,7 +46,7 @@ public:
 
 	void add_button(string text, function<void()> callback);
 
-	void mainloop() override;
+	int mainloop() override;
 
 	void exit();
 

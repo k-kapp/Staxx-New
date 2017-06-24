@@ -232,7 +232,7 @@ void menu::exit()
 }
 
 
-void menu::mainloop()
+int menu::mainloop()
 {
 	SDL_Event event;
 
@@ -261,6 +261,7 @@ void menu::mainloop()
 			}
 		}
 	}
+	return 0;
 }
 
 void menu::draw()

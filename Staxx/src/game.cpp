@@ -673,7 +673,7 @@ void game::reset_timer()
 	timer_id = SDL_AddTimer(delay, func_ptr, (void *)this);
 }
 
-void game::mainloop()
+int game::mainloop()
 {
 	bool quit = false;
 
@@ -782,6 +782,7 @@ void game::mainloop()
 			break;
 		}
 	}
+	return 0;
 }
 
 

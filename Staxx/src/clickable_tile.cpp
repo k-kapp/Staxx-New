@@ -74,11 +74,6 @@ void clickable_tile::update()
 	int x, y;
 	bool left_button_down = SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT);
 
-	if (left_button_down)
-	{
-		cout << "left mousebutton down" << endl;
-	}
-
 	bool mouse_on_this = mouse_on_button();
 
 	if (get_activation_level() != 2)

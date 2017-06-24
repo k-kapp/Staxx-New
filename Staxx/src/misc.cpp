@@ -1,16 +1,17 @@
 #include "../include/misc_types.h"
 #include "../include/constants.h"
 #include "../include/shape.h"
-#include <string>
-#include <vector>
-#include <utility>
-#include <memory>
 #include <boost/filesystem.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include <string>
+#include <vector>
+#include <utility>
+#include <memory>
+#include <cstdlib>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -92,39 +93,57 @@ vector<path> get_design_paths()
 	return paths;
 }
 
-vector<shared_ptr<shape> > import_shapes()
+vector<shared_ptr<shape> > imported_shapes::shapes;
+vector<string> imported_shapes::filenames;
+
+imported_shapes::imported_shapes()
 {
-	using namespace boost::filesystem;
-
-	if (!exists(path("designs/")))
-	{
-		cout << "no designs exist. on the main menu, ";
-		cout << "select the design option and design some shapes first" << endl;
-		return vector<shared_ptr<shape> >();
-	}
-
-	vector<shared_ptr<shape> > shapes;
-
-	directory_iterator curr_iter("designs/"), end;
-
-	for (; curr_iter != end; advance(curr_iter, 1))
-	{
-		if (design_path_valid(curr_iter->path()))
-		{
-			std::ifstream in_file(curr_iter->path().c_str());
-			boost::archive::text_iarchive ia(in_file);
-			shapes.push_back(make_shared<shape>(ia));
-		}
-	}
-
-	if (shapes.size() == 0)
-	{
-		cout << "no designs exist. on the main menu, ";
-		cout << "select the design option and design some shapes first" << endl;
-	}
-	return shapes;
-		
+	do_import_shapes();
 }
+
+void imported_shapes::do_import_shapes()
+{
+		using namespace boost::filesystem;
+
+		shapes.clear();
+		filenames.clear();
+
+		if (!exists(path("designs/")))
+		{
+			cout << "no designs exist. on the main menu, ";
+			cout << "select the design option and design some shapes first" << endl;
+		}
+
+		directory_iterator curr_iter("designs/"), end;
+
+		char * path_temp = new char[512];
+
+		for (; curr_iter != end; advance(curr_iter, 1))
+		{
+			if (design_path_valid(curr_iter->path()))
+			{
+				wcstombs(path_temp, curr_iter->path().c_str(), 512);
+				string filepath(path_temp);
+				cout << "filepath: " << filepath << endl;
+
+				std::ifstream in_file(curr_iter->path().c_str());
+				boost::archive::text_iarchive ia(in_file);
+
+				shapes.push_back(make_shared<shape>(ia));
+				filenames.push_back(filepath);
+			}
+		}
+
+		if (shapes.size() == 0)
+		{
+			cout << "no designs exist. on the main menu, ";
+			cout << "select the design option and design some shapes first" << endl;
+		}
+			
+		delete path_temp;
+}
+
+
 
 SDL_Surface * make_surface_from_colors(tile_colors colors, int width, int height)
 {

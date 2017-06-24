@@ -20,7 +20,7 @@ public:
 
 	virtual ~game_state();
 
-	virtual void mainloop() = 0;
+	virtual int mainloop() = 0;
 
 protected:
 	SDL_Window * window;

@@ -22,7 +22,7 @@ class design_selection : game_state
 public:
 	design_selection(int grid_x, int grid_y);
 
-	void mainloop() override;
+	int mainloop() override;
 private:
 
 	void update() override;
@@ -42,6 +42,8 @@ private:
 	void show_noselect_text(int delay);
 
 	int count_selected();
+
+	void update_selected_shapes();
 
 	static Uint32 sdl_timer_textoff_callback(Uint32 interval, void * args);
 
@@ -67,6 +69,9 @@ private:
 	bool draw_confirm_delete_text = false;
 	bool draw_noselect_text = false;
 	bool show_confirm_delete_buttons = false;
+	bool delete_button_clicked = false;
+
+	bool reload = false;
 
 	SDL_TimerID noselect_notify_timer = 0;
 };

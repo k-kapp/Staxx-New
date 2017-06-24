@@ -7,6 +7,9 @@
 #include "../include/constants.h"
 #include "../include/misc_types.h"
 
+#include <boost/range/combine.hpp>
+#include <boost/filesystem.hpp>
+
 #include <vector>
 #include <functional>
 
@@ -87,11 +90,13 @@ design_selection::design_selection(int grid_x, int grid_y)
 
 void design_selection::init_selection()
 {
-	vector<shared_ptr<shape> > shapes = ::import_shapes();
+	//vector<shared_ptr<shape> > shapes = ::imported_shapes();
+
+	imported_shapes();
 
 	vector<block> blocks;
 
-	for (auto &shape : shapes)
+	for (auto &shape : imported_shapes::shapes)
 	{
 		blocks.push_back(block(shape.get(), textures.at("red")));
 	}
@@ -169,6 +174,21 @@ void design_selection::cancel()
 	quit = true;
 }
 
+void design_selection::update_selected_shapes()
+{
+	selected_shapes.clear();
+
+	for (int i = 0; i < selectors.size(); i++)
+	{
+		shared_ptr<clickable_tile> &tile_ptr = selectors.at(i);
+		if (tile_ptr->get_activation_level() == 2)
+		{
+			//selected_shapes.push_back(all_shapes.at(i));
+			selected_shapes.push_back(imported_shapes::shapes.at(i));
+		}
+	}
+}
+
 void design_selection::save_selection()
 {
 	turn_all_text_off();
@@ -181,18 +201,9 @@ void design_selection::save_selection()
 		noselect_notify_timer = 0;
 	}
 
-	usable_shapes.clear();
+	update_selected_shapes();
 
-	for (int i = 0; i < selectors.size(); i++)
-	{
-		shared_ptr<clickable_tile> &tile_ptr = selectors.at(i);
-		if (tile_ptr->get_activation_level() == 2)
-		{
-			usable_shapes.push_back(all_shapes.at(i));
-		}
-	}
-
-	if (usable_shapes.size() == 0)
+	if (selected_shapes.size() == 0)
 	{
 		show_noselect_text(5000);
 		return;
@@ -289,12 +300,56 @@ void design_selection::delete_first_click()
 
 	draw_confirm_delete_text = true;
 	show_confirm_delete_buttons = true;
+	delete_button_clicked = true;
 }
 
 void design_selection::delete_selected_shapes()
 {
-	cout << "Delete code must still be written" << endl;
+	cout << "in delete_selected_shapes callback" << endl;
+
+	imported_shapes();
+	update_selected_shapes();
+
+	vector<string> delete_filepaths;
+
+	cout << "size of imported_shapes::shapes: " << imported_shapes::shapes.size() << endl;
+	cout << "size of imported_shapes::filenames: " << imported_shapes::filenames.size() << endl;
+
+	cout << "number of selected shapes: " << selected_shapes.size() << endl;
+
+	for (auto shape_ptr_selected : selected_shapes)
+	{
+		for (auto tup : boost::combine(imported_shapes::shapes, imported_shapes::filenames))
+		{
+			shared_ptr<shape> shape_ptr;
+			string filepath;
+			boost::tie(shape_ptr, filepath) = tup;
+			if (*shape_ptr_selected == *shape_ptr)
+			{
+				delete_filepaths.push_back(filepath);
+			}
+		}
+	}
+
+	cout << "size of delete_filepaths: " << delete_filepaths.size() << endl;
+
+	for (auto del_str : delete_filepaths)
+	{
+		cout << "filepath to be deleted: " << del_str << endl;
+		boost::filesystem::path del_path(del_str);
+		if (boost::filesystem::remove(del_path))
+		{
+			cout << "shape data at " << del_str << " removed successfully" << endl;
+		}
+		else
+		{
+			cout << "Error: shape data at " << del_str << " does not exist. No deletions done" << endl;
+		}
+	}
+
 	show_confirm_delete_buttons = false;
+
+	reload = true;
 }
 
 void design_selection::cancel_delete()
@@ -303,7 +358,7 @@ void design_selection::cancel_delete()
 	show_confirm_delete_buttons = false;
 }
 
-void design_selection::mainloop()
+int design_selection::mainloop()
 {
 	quit = false;
 	while (!quit)
@@ -328,7 +383,7 @@ void design_selection::mainloop()
 					cout << "up key pressed in game state class" << endl;
 				}
 			}
-			else if (sdl_event.type == SDL_MOUSEBUTTONDOWN)
+			else if (sdl_event.type == SDL_MOUSEBUTTONUP)
 			{
 				/*
 				* solution to remove dialog text when activity is detected.
@@ -339,9 +394,9 @@ void design_selection::mainloop()
 					turn_all_text_off();
 					if (noselect_notify_timer)
 					{
-						/*
-						*  TODO: check possible threading issues here
-						*/
+						
+						// TODO: check possible threading issues here
+						
 						SDL_bool remove_result = SDL_RemoveTimer(noselect_notify_timer);
 						noselect_notify_timer = 0;
 					}
@@ -359,9 +414,17 @@ void design_selection::mainloop()
 
 		/*
 	    * part of solution to remove dialog text when activity is detected.
-		* very hackish solution. Hope to have something more solid in the future
+		* Very hackish solution. Hope to have something more solid in the future
 		*/
-		if (left_button_pressed)
+		if (!delete_button_clicked && left_button_pressed)
 			show_confirm_delete_buttons = false;
+
+		delete_button_clicked = false;
+
+		if (reload)
+		{
+			return 1;
+		}
 	}
+	return 0;
 }

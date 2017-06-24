@@ -204,7 +204,7 @@ void design_grid::set_tile_colors()
 	}
 }
 
-void design_grid::mainloop()
+int design_grid::mainloop()
 {
 	quit = false;
 	while (!quit)
@@ -228,13 +228,14 @@ void design_grid::mainloop()
 			}
 		}
 	}
+	return 0;
 }
 
 bool design_grid::design_exists(const shape &new_design)
 {
-	auto existing = import_shapes();
+	imported_shapes();
 
-	for (auto &exist_shape : existing)
+	for (auto &exist_shape : imported_shapes::shapes)
 	{
 		if (new_design == *exist_shape)
 		{

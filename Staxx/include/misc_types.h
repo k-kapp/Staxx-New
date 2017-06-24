@@ -41,18 +41,27 @@ typedef enum move_type
 	ROTATE_MV
 } move_type;
 
+class shape;
+
+class imported_shapes
+{
+public:
+	imported_shapes();
+
+	static std::vector<std::shared_ptr<shape> > shapes;
+	static std::vector<std::string> filenames;
+private:
+	void do_import_shapes();
+};
+
 
 //functions below are implemented in src/misc.cpp
-
-class shape;
 
 bool design_path_valid(boost::filesystem::path filepath);
 
 int get_design_num(boost::filesystem::path filepath, bool check_valid = true);
 
 std::vector<boost::filesystem::path> get_design_paths();
-
-std::vector<std::shared_ptr<shape> > import_shapes();
 
 void set_pixel(SDL_Surface * surface, int x, int y, Uint32 color);
 

@@ -25,7 +25,7 @@ using namespace std;
 void new_game(menu * parent)
 {
 
-	if (usable_shapes.size() == 0)
+	if (selected_shapes.size() == 0)
 		return;
 
 	parent->hide_menu();
@@ -35,7 +35,7 @@ void new_game(menu * parent)
 	
 	cout << "game address: " << &game_grid << endl;
 
-	game_grid.add_shapes(usable_shapes);
+	game_grid.add_shapes(selected_shapes);
 	game_grid.init_sample();
 
 	game_grid.mainloop();
@@ -60,14 +60,21 @@ void new_design_selection(menu * parent)
 {
 	parent->hide_menu();
 
-	auto selection = design_selection(100, 100);
-	selection.mainloop();
+	auto selection_ptr = make_shared<design_selection>(100, 100);
+	while (selection_ptr->mainloop() == 1)
+	{
+		selection_ptr.reset(new design_selection(100, 100));
+
+		cout << "created new selection object" << endl;
+	}
 
 	parent->show_menu();
 }
 
 int main(int argc, char * argv [])
 {
+	init_imported_shapes();
+
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
 	{
 		cout << "unable to initialize SDL" << endl;
