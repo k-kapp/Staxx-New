@@ -16,16 +16,8 @@ TODO:
 + Add functionality for deleting shapes from within the program
 + Remember which shapes were selected in a previous run of the program (currently, all shapes are initially selected. The user must select the desired shapes again, after running the program again).
 
-Some screenshots follow. The first is of gameplay, the second of the design grid, and the third screenshot is the main menu:
+A screenshot of the gameplay screen is shown below.
 
 <p align="center">
 <img src="Game.png" width="650">
-</p>
-
-<p align="center">
-<img src="Design.png" width="500">
-</p>
-
-<p align="center">
-<img src="MainMenu.png" width="350">
 </p>
